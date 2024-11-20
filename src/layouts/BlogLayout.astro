@@ -12,6 +12,21 @@ const publishedPosts = posts.filter(post => {
   const publishDate = new Date(post.data.publishDate);
   return publishDate <= now;
 }).sort((a, b) => new Date(b.data.publishDate).getTime() - new Date(a.data.publishDate).getTime());
+
+// Group posts by category
+const groupedPosts = publishedPosts.reduce((acc, post) => {
+  const category = post.data.category || 'miscellaneous';
+  if (!acc[category]) acc[category] = [];
+  acc[category].push(post);
+  return acc;
+}, {} as Record<string, typeof publishedPosts>);
+
+// Define category order
+const categoryOrder = ['helpers', 'classic'];
+const sortedCategories = [
+  ...categoryOrder,
+  ...Object.keys(groupedPosts).filter(cat => !categoryOrder.includes(cat))
+];
 ---
 
 <Layout title={frontmatter.title}>
@@ -23,36 +38,43 @@ const publishedPosts = posts.filter(post => {
       </a>
       
       <nav>
-        <ul class="space-y-6">
-          {publishedPosts.map(post => (
-            <li>
-              <a 
-                href={`/blog/${post.slug}`}
-                class:list={[
-                  'block text-sm hover:text-white transition-colors',
-                  post.slug === Astro.params.slug ? 'text-white font-medium' : 'text-gray-400'
-                ]}
-              >
-                {post.data.title}
-              </a>
-              
-              {post.slug === Astro.params.slug && headings.length > 0 && (
-                <ul class="mt-2 ml-4 space-y-2">
-                  {headings.filter(h => h.depth === 2).map(heading => (
-                    <li>
-                      <a 
-                        href={`#${heading.slug}`}
-                        class="block text-xs text-gray-500 hover:text-gray-300 transition-colors"
-                      >
-                        {heading.text}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
-          ))}
-        </ul>
+        {sortedCategories.map(category => (
+          groupedPosts[category] && groupedPosts[category].length > 0 && (
+            <div class="mb-6">
+              <h3 class="text-gray-500 uppercase text-xs font-semibold mb-3">{category}</h3>
+              <ul class="space-y-6">
+                {groupedPosts[category].map(post => (
+                  <li>
+                    <a 
+                      href={`/blog/${post.slug}`}
+                      class:list={[
+                        'block text-sm hover:text-white transition-colors',
+                        post.slug === Astro.params.slug ? 'text-white font-medium' : 'text-gray-400'
+                      ]}
+                    >
+                      {post.data.title}
+                    </a>
+                    
+                    {post.slug === Astro.params.slug && headings.length > 0 && (
+                      <ul class="mt-2 ml-4 space-y-2">
+                        {headings.filter(h => h.depth === 2).map(heading => (
+                          <li>
+                            <a 
+                              href={`#${heading.slug}`}
+                              class="block text-xs text-gray-500 hover:text-gray-300 transition-colors"
+                            >
+                              {heading.text}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        ))}
       </nav>
     </aside>
 
