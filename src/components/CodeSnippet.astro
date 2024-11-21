@@ -1,5 +1,6 @@
 ---
 import { Copy } from 'lucide-astro';
+import { Code } from 'astro:components';
 
 interface Props {
   file: string;
@@ -19,15 +20,18 @@ if (filePath in snippetFiles) {
 }
 ---
 
-<div class="snippet-container relative group">
+<div class='snippet-container relative group'>
   <button
-    class="copy-button absolute top-3 right-3 p-2 rounded-lg bg-gray-800/50 hover:bg-gray-700/50 opacity-0 group-hover:opacity-100 transition-opacity"
-    aria-label="Copy code"
+    class='copy-button absolute top-3 right-3 p-2 rounded-lg bg-gray-800/50 hover:bg-gray-700/50 opacity-0 group-hover:opacity-100 transition-opacity'
+    aria-label='Copy code'
     data-code={code}
   >
-    <Copy class="w-5 h-5 text-gray-400" />
+    <Copy class='w-5 h-5 text-gray-400' />
   </button>
-  <pre class="!mt-0 !mb-0"><code class="language-typescript">{code}</code></pre>
+  <Code code={code} lang='ts' theme='tokyo-night' />
+  <!-- <Code code={code} lang='ts' theme='houston' /> -->
+  <!-- <Code code={code} lang='ts' theme='material-theme-ocean' /> -->
+  <!-- <Code code={code} lang='ts' theme='github-dark-default' /> -->
 </div>
 
 <style>
@@ -60,7 +64,7 @@ if (filePath in snippetFiles) {
       const code = button.getAttribute('data-code');
       if (code) {
         await navigator.clipboard.writeText(code);
-        
+
         // Visual feedback
         const icon = button.querySelector('svg');
         if (icon) {
