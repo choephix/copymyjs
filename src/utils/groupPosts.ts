@@ -7,7 +7,7 @@ interface GroupPostsOptions {
 }
 
 export function groupPosts(
-  posts: CollectionEntry<"blog">[],
+  posts: CollectionEntry<"posts">[],
   options: GroupPostsOptions = {}
 ) {
   const { includeDrafts = false, includeFuture = false } = options;

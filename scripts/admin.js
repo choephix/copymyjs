@@ -4,7 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const BLOG_DIR = path.join(__dirname, '../src/content/blog');
+const POSTS_DIR = path.join(__dirname, '../src/content/posts');
 
 // ANSI escape codes for colors
 const colors = {
@@ -37,12 +37,12 @@ async function parsePostFrontmatter(content) {
 }
 
 async function getAllPosts() {
-  const files = await fs.readdir(BLOG_DIR);
+  const files = await fs.readdir(POSTS_DIR);
   const showFilenames = process.argv.includes('--byfilename');
   
   const posts = await Promise.all(
     files.map(async (file) => {
-      const content = await fs.readFile(path.join(BLOG_DIR, file), 'utf-8');
+      const content = await fs.readFile(path.join(POSTS_DIR, file), 'utf-8');
       const frontmatter = await parsePostFrontmatter(content);
       const isDraft = frontmatter.draft === 'true';
       const publishDate = new Date(frontmatter.publishDate);
@@ -70,7 +70,7 @@ async function getAllPosts() {
 
 async function toggleDrafts(selectedFiles, posts) {
   for (const file of selectedFiles) {
-    const filePath = path.join(BLOG_DIR, file);
+    const filePath = path.join(POSTS_DIR, file);
     let content = await fs.readFile(filePath, 'utf-8');
     const post = posts.find(p => p.file === file);
     

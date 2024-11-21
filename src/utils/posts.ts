@@ -1,8 +1,8 @@
 import { getCollection } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 
-export async function getPublishedPosts(): Promise<CollectionEntry<'blog'>[]> {
-  const allPosts = await getCollection('blog');
+export async function getPublishedPosts(): Promise<CollectionEntry<'posts'>[]> {
+  const allPosts = await getCollection('posts');
   const now = new Date();
 
   return allPosts

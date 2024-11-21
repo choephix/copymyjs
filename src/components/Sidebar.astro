@@ -2,7 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 
 interface Props {
-  groupedPosts: Record<string, CollectionEntry<'blog'>[]>;
+  groupedPosts: Record<string, CollectionEntry<'posts'>[]>;
   sortedCategories: string[];
   currentSlug?: string;
   headings: { depth: number; slug: string; text: string; }[];
@@ -25,7 +25,7 @@ const { groupedPosts, sortedCategories, currentSlug, headings } = Astro.props;
             {groupedPosts[category].map(post => (
               <li>
                 <a 
-                  href={`/blog/${post.slug}`}
+                  href={`/posts/${post.slug}`}
                   class:list={[
                     'block text-sm hover:text-white transition-colors',
                     post.slug === currentSlug ? 'text-white font-medium' : 'text-gray-400'
