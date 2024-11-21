@@ -9,7 +9,7 @@ interface Props {
 const { file } = Astro.props;
 
 // Import all snippet files
-const snippetFiles = import.meta.glob('/src/snippets/**/*.ts', { as: 'raw' });
+const snippetFiles = import.meta.glob<string>('/src/snippets/**/*.ts', { query: '?raw', import: 'default' });
 const filePath = `/src/snippets/${file}`;
 
 let code = '';
