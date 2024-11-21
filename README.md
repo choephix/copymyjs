@@ -11,13 +11,13 @@ A collection of battle-tested, copy-paste ready JavaScript and TypeScript snippe
 
 ```bash
 # Install dependencies
-pnpm install
+npm install
 
 # Start development server
-pnpm run dev
+npm run dev
 
 # Build for production
-pnpm run build
+npm run build
 ```
 
 ## Contributing
