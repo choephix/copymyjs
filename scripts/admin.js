@@ -10,20 +10,62 @@ const BLOG_DIR = path.join(__dirname, '../src/content/blog');
 const colors = {
   green: '\x1b[32m',
   yellow: '\x1b[33m',
+  cyan: '\x1b[36m',
   red: '\x1b[31m',
-  reset: '\x1b[0m'
+  blue: '\x1b[34m',
+  reset: '\x1b[0m',
+  bold: '\x1b[1m'
 };
+
+async function parsePostFrontmatter(content) {
+  const frontmatterMatch = content.match(/---\n([\s\S]*?)\n---/);
+  if (!frontmatterMatch) return {};
+
+  const frontmatter = {};
+  const lines = frontmatterMatch[1].split('\n');
+  
+  for (const line of lines) {
+    const [key, ...valueParts] = line.split(':');
+    if (!key || !valueParts.length) continue;
+    
+    const value = valueParts.join(':').trim();
+    // Remove quotes if present
+    frontmatter[key.trim()] = value.replace(/^["']|["']$/g, '');
+  }
+  
+  return frontmatter;
+}
 
 async function getAllPosts() {
   const files = await fs.readdir(BLOG_DIR);
+  const showFilenames = process.argv.includes('--byfilename');
+  
   const posts = await Promise.all(
     files.map(async (file) => {
       const content = await fs.readFile(path.join(BLOG_DIR, file), 'utf-8');
-      const isDraft = /draft:\s*true/.test(content);
-      return { file, isDraft, willBeDraft: isDraft };
+      const frontmatter = await parsePostFrontmatter(content);
+      const isDraft = frontmatter.draft === 'true';
+      const publishDate = new Date(frontmatter.publishDate);
+      const isScheduled = !isDraft && publishDate > new Date();
+      
+      return {
+        file,
+        title: showFilenames ? file.replace('.mdx', '') : frontmatter.title,
+        category: frontmatter.category || 'uncategorized',
+        isDraft,
+        isScheduled,
+        publishDate,
+        willBeDraft: isDraft
+      };
     })
   );
-  return posts;
+
+  // Sort by category and then by title
+  return posts.sort((a, b) => {
+    if (a.category !== b.category) return a.category.localeCompare(b.category);
+    return (a.publishDate?.getTime() || 0) - (b.publishDate?.getTime() || 0)
+    //return a.file.localeCompare(b.file);
+  });
 }
 
 async function toggleDrafts(selectedFiles, posts) {
@@ -48,33 +90,64 @@ async function toggleDrafts(selectedFiles, posts) {
 }
 
 function formatChoice(post) {
-  const prefix = post.willBeDraft ? 'DRAFT' : '     ';
-  const color = post.willBeDraft ? colors.yellow : colors.green;
-  return `${color}${prefix} ${post.file.replace('.mdx', '')}${colors.reset}`;
+  let prefix, color;
+  
+  if (post.willBeDraft) {
+    prefix = 'DRAFT';
+    color = colors.yellow;
+  } else if (post.isScheduled) {
+    prefix = 'SCHED';
+    color = colors.cyan;
+  } else {
+    prefix = '     ';
+    color = colors.green;
+  }
+
+  return `${color}${prefix} | ${post.title}${colors.reset}`;
+}
+
+function formatCategory(category) {
+  const categoryName = category?.toUpperCase() || '';
+  return `\n${colors.blue}${colors.bold}${categoryName}${colors.reset}\n`;
 }
 
 async function main() {
   const posts = await getAllPosts();
+  let currentCategory = '';
   
   const prompt = new enquirer.MultiSelect({
     name: 'posts',
     message: 'Select posts to toggle draft status (space to select, enter to confirm)',
-    choices: posts.map((post) => ({
-      name: post.file,
-      message: formatChoice(post),
-      onChoice(state, choice) {
-        const post = posts.find(p => p.file === choice.name);
-        if (state.submitted) return;
-        
-        if (choice.enabled) {
-          post.willBeDraft = !post.isDraft;
-        } else {
-          post.willBeDraft = post.isDraft;
-        }
-        
-        choice.message = formatChoice(post);
+    choices: posts.map((post) => {
+      // Add category header if category changes
+      const choices = [];
+      if (currentCategory !== post.category) {
+        currentCategory = post.category;
+        choices.push({
+          role: 'separator',
+          message: formatCategory(post.category)
+        });
       }
-    })),
+      
+      choices.push({
+        name: post.file,
+        message: formatChoice(post),
+        onChoice(state, choice) {
+          const post = posts.find(p => p.file === choice.name);
+          if (state.submitted) return;
+          
+          if (choice.enabled) {
+            post.willBeDraft = !post.isDraft;
+          } else {
+            post.willBeDraft = post.isDraft;
+          }
+          
+          choice.message = formatChoice(post);
+        }
+      });
+      
+      return choices;
+    }).flat(),
     result(names) {
       return this.map(names);
     }
