@@ -1,8 +1,10 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getPublishedPosts } from '../utils/posts';
+import { getCollection } from 'astro:content';
+import { groupPosts } from '../utils/groupPosts';
 
-const posts = await getPublishedPosts();
+const posts = await getCollection('blog');
+const { groupedPosts, sortedCategories } = groupPosts(posts);
 ---
 
 <Layout title="CopyMyJS - Useful JavaScript & TypeScript Snippets">
@@ -19,9 +21,7 @@ const posts = await getPublishedPosts();
       </h1>
       <div class="bg-gray-800/50 p-8 rounded-lg border border-gray-700 mb-8">
         <p class="text-xl text-gray-300 mb-4">
-          A collection of battle-tested, copy-paste ready 
-          {/* <span class="bg-[#f7df1e] text-black font-bold px-1.5 py-0.25 small-caps">js</span> /
-          <span class="bg-[#3178c6] text-white font-bold px-1.5 py-0.25 small-caps">ts</span> */} snippets 
+          A collection of battle-tested, copy-paste ready snippets 
           for your projects.
         </p>
         <p class="text-gray-400">
@@ -31,17 +31,26 @@ const posts = await getPublishedPosts();
       </div>
     </div>
     
-    <div class="space-y-8">
-      {posts.map(post => (
-        <article class="border border-gray-700 rounded-lg p-6 hover:border-gray-500 transition-colors">
-          <a href={`/blog/${post.slug}`} class="block">
-            <h2 class="text-2xl font-bold text-white mb-2">{post.data.title}</h2>
-            <p class="text-gray-400 mb-4">{post.data.description}</p>
-            <div class="text-sm text-gray-500">
-              Published on {post.data.publishDate}
+    <div class="space-y-12">
+      {sortedCategories.map(category => (
+        groupedPosts[category] && groupedPosts[category].length > 0 && (
+          <section>
+            <h2 class="text-2xl font-bold text-white mb-6 capitalize">{category}</h2>
+            <div class="space-y-6">
+              {groupedPosts[category].map(post => (
+                <article class="border border-gray-700 rounded-lg p-6 hover:border-gray-500 transition-colors">
+                  <a href={`/blog/${post.slug}`} class="block">
+                    <h3 class="text-xl font-bold text-white mb-2">{post.data.title}</h3>
+                    <p class="text-gray-400 mb-4">{post.data.description}</p>
+                    <div class="text-sm text-gray-500">
+                      Published on {post.data.publishDate}
+                    </div>
+                  </a>
+                </article>
+              ))}
             </div>
-          </a>
-        </article>
+          </section>
+        )
       ))}
     </div>
   </main>
