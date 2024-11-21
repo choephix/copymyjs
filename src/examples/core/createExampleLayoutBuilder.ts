@@ -37,7 +37,9 @@ export function createExampleLayoutBuilder(parentElement: HTMLElement): ExampleL
         logContainer = document.createElement('div');
         logContainer.className =
           'w-64 p-2 bg-[#19233a] font-mono text-xs ' +
-          'shrink-0 overflow-y-auto self-stretch max-h-[256px] outline outline-1 outline-gray-700';
+          'shrink-0 overflow-y-auto self-stretch max-h-[256px]' + 
+          'outline outline-1 outline-gray-700 ' +
+          'animate-slide-in';
         wrapper.appendChild(logContainer);
         
         // Replace lazy methods with real ones

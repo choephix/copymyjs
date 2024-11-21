@@ -8,6 +8,15 @@ export default {
         'all-small-caps': 'all-small-caps',
         'titling-caps': 'titling-caps',
       },
+      keyframes: {
+        'slide-in': {
+          '0%': { transform: 'translateX(100%)' },
+          '100%': { transform: 'translateX(0)' },
+        }
+      },
+      animation: {
+        'slide-in': 'slide-in 0.15s ease-in-out',
+      }
     },
   },
   plugins: [
