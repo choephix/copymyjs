@@ -4,18 +4,27 @@ interface Props {
   namedExport?: string;
 }
 
-const { component, namedExport} = Astro.props;
+const { component, namedExport } = Astro.props;
 ---
 
-<div class='example-container'>
-  <div class='example-content' data-example={component} data-named-export={namedExport}></div>
+<div class='example-container mt-6'>
+  <div
+    class='example-content border border-gray-700 rounded overflow-hidden bg-[#212f4d]'
+    data-example={component}
+    data-named-export={namedExport}
+  >
+  </div>
 </div>
 
 <script>
-  const loadExample = async (container: HTMLElement, componentName: string, namedExport?: string) => {
+  const loadExample = async (
+    container: HTMLElement,
+    componentName: string,
+    namedExport?: string
+  ) => {
     try {
       const module = await import(`../examples/${componentName}.ts`);
-      
+
       if (namedExport && module[namedExport]) {
         module[namedExport](container);
       } else if (module.default) {
@@ -52,13 +61,3 @@ const { component, namedExport} = Astro.props;
     observer.observe(el);
   });
 </script>
-
-<style>
-  .example-container {
-    margin: 1.5rem 0;
-    padding: 1.5rem;
-    border: 1px solid #333;
-    border-radius: 0.5rem;
-    background: #1a1a1a;
-  }
-</style>

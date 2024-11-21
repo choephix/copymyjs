@@ -13,12 +13,12 @@ interface ExampleLayoutBuilder {
 export function createExampleLayoutBuilder(parentElement: HTMLElement): ExampleLayoutBuilder {
   // Single wrapper with flex row
   const wrapper = document.createElement('div');
-  wrapper.className = 'flex flex-row gap-4';
+  wrapper.className = 'flex flex-row gap-4 overflow-hidden';
   parentElement.appendChild(wrapper);
-
+  
   // Main container that grows naturally
   const mainContainer = document.createElement('div');
-  mainContainer.className = 'space-y-4 flex-1';
+  mainContainer.className = 'space-y-4 flex-1 min-h-0 p-6';
   wrapper.appendChild(mainContainer);
 
   let logContainer: HTMLElement | null = null;
@@ -32,8 +32,8 @@ export function createExampleLayoutBuilder(parentElement: HTMLElement): ExampleL
       // Logger that matches height of mainContainer and scrolls
       logContainer = document.createElement('div');
       logContainer.className =
-        'w-64 p-2 bg-gray-100 dark:bg-gray-800 rounded font-mono text-xs ' +
-        'shrink-0 overflow-y-auto self-stretch max-h-[256px]';
+        'w-64 p-2 bg-[#19233a] font-mono text-xs ' +
+        'shrink-0 overflow-y-auto self-stretch max-h-[256px] outline outline-1 outline-gray-700';
       wrapper.appendChild(logContainer);
 
       return createLoggerInterface(logContainer);
