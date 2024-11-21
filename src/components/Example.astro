@@ -6,44 +6,44 @@ interface Props {
 const { component } = Astro.props;
 ---
 
-<div class="example-container">
-  <div class="example-content" data-example={component}></div>
+<div class='example-container'>
+  <div class='example-content' data-example={component}></div>
 </div>
 
 <script>
-const loadExample = async (container, componentName) => {
-  try {
-    const module = await import(`../examples/${componentName}.ts`);
-    if (module.default) {
-      module.default(container);
-    }
-  } catch (error) {
-    console.error('Failed to load example:', error);
-    container.innerHTML = `
+  const loadExample = async (container, componentName) => {
+    try {
+      const module = await import(`../examples/${componentName}.ts`);
+      if (module.default) {
+        module.default(container);
+      }
+    } catch (error) {
+      console.error('Failed to load example:', error);
+      container.innerHTML = `
       <div class="p-4 bg-red-900/50 border border-red-500 rounded">
         <p class="text-red-200">Failed to load example: ${error.message}</p>
       </div>
     `;
-  }
-};
-
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach((entry) => {
-    if (entry.isIntersecting) {
-      const container = entry.target.querySelector('.example-content');
-      const componentName = container?.dataset.example;
-      
-      if (container && componentName) {
-        loadExample(container, componentName);
-        observer.unobserve(entry.target);
-      }
     }
-  });
-});
+  };
 
-document.querySelectorAll('.example-container').forEach((el) => {
-  observer.observe(el);
-});
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const container = entry.target.querySelector<HTMLDivElement>('.example-content');
+        const componentName = container?.dataset.example;
+
+        if (container && componentName) {
+          loadExample(container, componentName);
+          observer.unobserve(entry.target);
+        }
+      }
+    });
+  });
+
+  document.querySelectorAll('.example-container').forEach(el => {
+    observer.observe(el);
+  });
 </script>
 
 <style>
