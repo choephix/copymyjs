@@ -6,7 +6,7 @@ export default function example1(container: HTMLElement) {
   console.log(container);
 
   const builder = createExampleLayoutBuilder(container);
-  const logger = builder.addLogger();
+  const { logger } = builder;
   
   builder.addHtml(`
     <div class="flex gap-4 items-center">

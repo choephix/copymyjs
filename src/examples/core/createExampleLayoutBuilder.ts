@@ -6,7 +6,7 @@ interface Logger {
 
 interface ExampleLayoutBuilder {
   container: HTMLElement;
-  addLogger: () => Logger;
+  logger: Logger;
   addHtml: (html: string) => void;
 }
 
@@ -22,23 +22,36 @@ export function createExampleLayoutBuilder(parentElement: HTMLElement): ExampleL
   wrapper.appendChild(mainContainer);
 
   let logContainer: HTMLElement | null = null;
+  
+  // Create lazy logger that initializes UI on first use
+  const lazyLogger: Logger = {
+    log: createLazyLogMethod('log'),
+    warn: createLazyLogMethod('warn'),
+    error: createLazyLogMethod('error'),
+  };
+
+  function createLazyLogMethod(type: 'log' | 'warn' | 'error') {
+    return (message: string) => {
+      if (!logContainer) {
+        // Initialize logger UI on first use
+        logContainer = document.createElement('div');
+        logContainer.className =
+          'w-64 p-2 bg-[#19233a] font-mono text-xs ' +
+          'shrink-0 overflow-y-auto self-stretch max-h-[256px] outline outline-1 outline-gray-700';
+        wrapper.appendChild(logContainer);
+        
+        // Replace lazy methods with real ones
+        Object.assign(lazyLogger, createLoggerInterface(logContainer));
+      }
+      
+      // Forward to the real method
+      lazyLogger[type](message);
+    };
+  }
 
   return {
     container: mainContainer,
-
-    addLogger() {
-      if (logContainer) return createLoggerInterface(logContainer);
-
-      // Logger that matches height of mainContainer and scrolls
-      logContainer = document.createElement('div');
-      logContainer.className =
-        'w-64 p-2 bg-[#19233a] font-mono text-xs ' +
-        'shrink-0 overflow-y-auto self-stretch max-h-[256px] outline outline-1 outline-gray-700';
-      wrapper.appendChild(logContainer);
-
-      return createLoggerInterface(logContainer);
-    },
-
+    logger: lazyLogger,
     addHtml(html: string) {
       mainContainer.insertAdjacentHTML('beforeend', html);
     },

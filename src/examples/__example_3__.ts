@@ -2,7 +2,7 @@ import { createExampleLayoutBuilder } from './core/createExampleLayoutBuilder';
 
 export function example3(container: HTMLElement) {
   const builder = createExampleLayoutBuilder(container);
-  const logger = builder.addLogger();
+  const { logger } = builder;
   
   builder.addHtml(`
     <div class="flex gap-4 items-center">
