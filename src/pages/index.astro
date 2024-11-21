@@ -5,6 +5,11 @@ import { groupPosts } from '../utils/groupPosts';
 
 const posts = await getCollection('blog');
 const { groupedPosts, sortedCategories } = groupPosts(posts);
+
+// const jstsLangStyle = 'font-bold px-1.5 py-0.25 small-caps rounded-md';
+const jstsLangStyle = 'font-bold px-2.5 py-0.5 small-caps uppercase rounded-md';
+const jsLangStyle = `${jstsLangStyle} bg-[#f7df1e] text-black`;
+const tsLangStyle = `${jstsLangStyle} bg-[#3178c6] text-white`;
 ---
 
 <Layout title="CopyMyJS - Useful JavaScript & TypeScript Snippets">
@@ -17,7 +22,7 @@ const { groupedPosts, sortedCategories } = groupPosts(posts);
       />
       <h1 class="text-5xl font-bold mb-16 text-white">
         Copy My 
-          <span class="bg-[#f7df1e] text-black font-bold px-1.5 py-0.25 small-caps rounded-md">js</span> / <span class="bg-[#3178c6] text-white font-bold px-1.5 py-0.25 small-caps  rounded-md">ts</span>
+          <span class={jsLangStyle}>js</span> / <span class={tsLangStyle}>ts</span>
       </h1>
       <div class="bg-gray-800/50 p-8 rounded-lg border border-gray-700 mb-8">
         <p class="text-xl text-gray-300 mb-4">
