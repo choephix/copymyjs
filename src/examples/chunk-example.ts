@@ -1,4 +1,4 @@
-import { chunk } from '@/snippets/array/chunk';
+import { chunk } from '@/snippets/array-chunk';
 
 export default function(container: HTMLElement) {
   const numbers = Array.from({ length: 10 }, (_, i) => i + 1);

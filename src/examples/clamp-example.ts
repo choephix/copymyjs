@@ -1,4 +1,4 @@
-import { clamp } from '@/snippets/number/clamp';
+import { clamp } from '@/snippets/number-clamp';
 
 export default function(container: HTMLElement) {
   container.innerHTML = `

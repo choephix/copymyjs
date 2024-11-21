@@ -1,4 +1,4 @@
-import { pick } from '@/snippets/object/pick';
+import { pick } from '@/snippets/object-pick';
 
 export default function(container: HTMLElement) {
   const user = {

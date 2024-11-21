@@ -1,4 +1,4 @@
-import { delayMs } from '@/snippets/async/delay';
+import { delayMs } from '@/snippets/async-delay';
 
 export default function(container: HTMLElement) {
   container.innerHTML = `

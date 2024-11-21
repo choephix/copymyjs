@@ -1,4 +1,4 @@
-import { slugify } from '@/snippets/string/slugify';
+import { slugify } from '@/snippets/string-slugify';
 
 export default function(container: HTMLElement) {
   container.innerHTML = `

@@ -1,4 +1,4 @@
-import { unique } from '@/snippets/array/unique';
+import { unique } from '@/snippets/array-unique';
 
 export default function(container: HTMLElement) {
   const numbers = [1, 2, 2, 3, 3, 3, 4, 5, 5];

@@ -1,4 +1,4 @@
-import { debounce } from '@/snippets/function/debounce';
+import { debounce } from '@/snippets/function-debounce';
 
 export default function(container: HTMLElement) {
   container.innerHTML = `
