@@ -20,7 +20,7 @@ const { title, showHomeLink = false } = Astro.props;
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
   </head>
-  <body class="bg-gray-900 min-h-screen flex flex-col">
+  <body class="bg-gray-900 min-h-screen flex flex-col ">
     {/* <Header showHomeLink={showHomeLink} /> */}
     <div class="flex-1">
       <slot />
@@ -55,5 +55,30 @@ const { title, showHomeLink = false } = Astro.props;
       Bitstream Vera Sans Mono,
       Courier New,
       monospace;
+  }
+
+  /* Global custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #374151;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #4B5563;
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #374151 transparent;
   }
 </style>

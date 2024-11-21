@@ -26,6 +26,23 @@ export default {
         '.small-caps': { 'font-variant-caps': 'small-caps' },
         '.all-small-caps': { 'font-variant-caps': 'all-small-caps' },
         '.titling-caps': { 'font-variant-caps': 'titling-caps' },
+        '.scrollbar-slim': {
+          '&::-webkit-scrollbar': {
+            width: '4px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: 'transparent',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: '#4B5563',
+            borderRadius: '2px',
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            background: '#6B7280',
+          },
+          'scrollbarWidth': 'thin',
+          'scrollbarColor': '#4B5563 transparent',
+        },
       };
       addUtilities(newUtilities, ['responsive', 'hover']);
     },

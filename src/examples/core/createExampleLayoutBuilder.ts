@@ -33,20 +33,17 @@ export function createExampleLayoutBuilder(parentElement: HTMLElement): ExampleL
   function createLazyLogMethod(type: 'log' | 'warn' | 'error') {
     return (message: string) => {
       if (!logContainer) {
-        // Initialize logger UI on first use
         logContainer = document.createElement('div');
         logContainer.className =
           'w-64 p-2 bg-[#19233a] font-mono text-xs ' +
           'shrink-0 overflow-y-auto self-stretch max-h-[200px] ' + 
           'outline outline-1 outline-gray-700 ' +
-          'animate-slide-in';
+          'animate-slide-in scrollbar-slim';
         wrapper.appendChild(logContainer);
         
-        // Replace lazy methods with real ones
         Object.assign(lazyLogger, createLoggerInterface(logContainer));
       }
       
-      // Forward to the real method
       lazyLogger[type](message);
     };
   }
