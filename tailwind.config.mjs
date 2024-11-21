@@ -21,4 +21,12 @@ export default {
       addUtilities(newUtilities, ['responsive', 'hover']);
     },
   ],
+  safelist: [
+    'bg-yellow-500',
+    'bg-blue-500',
+    'text-yellow-200',
+    'text-blue-200',
+    'border-yellow-500',
+    'border-blue-500',
+  ],
 }
