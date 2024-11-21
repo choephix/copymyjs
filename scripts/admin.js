@@ -62,7 +62,7 @@ async function getAllPosts() {
 
   // Sort by category and then by title
   return posts.sort((a, b) => {
-    if (a.category !== b.category) return a.category.localeCompare(b.category);
+    if (a.category !== b.category) return b.category.localeCompare(a.category);
     return (a.publishDate?.getTime() || 0) - (b.publishDate?.getTime() || 0)
     //return a.file.localeCompare(b.file);
   });
