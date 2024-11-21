@@ -1,21 +1,27 @@
 ---
 interface Props {
   component: string;
+  namedExport?: string;
 }
 
-const { component } = Astro.props;
+const { component, namedExport} = Astro.props;
 ---
 
 <div class='example-container'>
-  <div class='example-content' data-example={component}></div>
+  <div class='example-content' data-example={component} data-named-export={namedExport}></div>
 </div>
 
 <script>
-  const loadExample = async (container, componentName) => {
+  const loadExample = async (container: HTMLElement, componentName: string, namedExport?: string) => {
     try {
       const module = await import(`../examples/${componentName}.ts`);
-      if (module.default) {
+      
+      if (namedExport && module[namedExport]) {
+        module[namedExport](container);
+      } else if (module.default) {
         module.default(container);
+      } else {
+        throw new Error('No suitable export found');
       }
     } catch (error) {
       console.error('Failed to load example:', error);
@@ -32,9 +38,10 @@ const { component } = Astro.props;
       if (entry.isIntersecting) {
         const container = entry.target.querySelector<HTMLDivElement>('.example-content');
         const componentName = container?.dataset.example;
+        const namedExport = container?.dataset.namedExport;
 
         if (container && componentName) {
-          loadExample(container, componentName);
+          loadExample(container, componentName, namedExport);
           observer.unobserve(entry.target);
         }
       }
