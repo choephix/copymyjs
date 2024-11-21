@@ -1,0 +1,41 @@
+---
+const isDev = import.meta.env.DEV;
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="border-t border-gray-800 bg-gray-900/50 mt-20">
+  <div class="max-w-3xl mx-auto px-4 py-8">
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="text-gray-400 text-sm">
+        © {currentYear} CopyMyJS. All code snippets are MIT licensed.
+      </div>
+      
+      <div class="flex items-center gap-6">
+        <a 
+          href="https://github.com/stackblitz/copymyjs" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          class="text-gray-400 hover:text-white transition-colors text-sm"
+        >
+          GitHub
+        </a>
+        <a 
+          href="https://twitter.com/stackblitz" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          class="text-gray-400 hover:text-white transition-colors text-sm"
+        >
+          Twitter
+        </a>
+        {isDev && (
+          <a 
+            href="/super-secret-page" 
+            class="text-gray-600 hover:text-gray-400 transition-colors text-sm"
+          >
+            🤫
+          </a>
+        )}
+      </div>
+    </div>
+  </div>
+</footer>
