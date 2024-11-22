@@ -57,6 +57,14 @@ if (filePath in snippetFiles) {
     padding: 1rem;
     background: transparent;
     border: none;
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    word-break: break-all;
+  }
+
+  .snippet-container code {
+    word-wrap: break-word !important;
+    white-space: pre-wrap !important;
   }
 
   /* Override any conflicting styles from prose class */
@@ -65,6 +73,14 @@ if (filePath in snippetFiles) {
     padding: 1rem;
     background: transparent;
     border: none;
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+  }
+
+  /* Ensure code inside pre wraps properly */
+  :global(.prose .snippet-container pre code) {
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
   }
 </style>
 
