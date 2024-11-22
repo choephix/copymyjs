@@ -1,7 +1,13 @@
 ---
 import { Copy } from 'lucide-astro';
 import { Code } from 'astro:components';
+
+import { stripComments } from '@/utils/code/stripComments';
+import { stripTypes } from '@/utils/code/stripTypes';
 import ErrorBanner from './ErrorBanner.astro';
+
+const shouldStripTypes = false;
+const shouldStripComments = true;
 
 interface Props {
   file: string;
@@ -20,6 +26,8 @@ let code = '';
 let fileExists = false;
 if (filePath in snippetFiles) {
   code = await snippetFiles[filePath]();
+  if (shouldStripTypes) code = stripTypes(code);
+  if (shouldStripComments) code = stripComments(code);
   fileExists = true;
 }
 ---
