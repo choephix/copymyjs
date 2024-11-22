@@ -18,7 +18,10 @@ export class MultipleReasons extends EventBus<{
   /**
    * @return Returns back the same promise, given in the params.
    */
-  public addDuring<T>(identifier: ReasonIdentifier, promiseToUnblockAfter: Promise<T>) {
+  public addDuring<T>(
+    identifier: ReasonIdentifier,
+    promiseToUnblockAfter: Promise<T>
+  ) {
     this.add(identifier);
     promiseToUnblockAfter.then(() => this.remove(identifier));
     return promiseToUnblockAfter;
@@ -154,16 +157,23 @@ export class MultipleReasons extends EventBus<{
   }
 
   public toString() {
-    return [...this.reasons].map(r => (typeof r === `symbol` ? String(r) : r)).join(', ');
+    return [...this.reasons]
+      .map(r => (typeof r === `symbol` ? String(r) : r))
+      .join(', ');
   }
 }
 
 export module MultipleReasons {
-  export function prettifyMultipleReasonsMapToStingMethod<T extends Record<string, MultipleReasons>>(map: T) {
+  export function prettifyMultipleReasonsMapToStingMethod<
+    T extends Record<string, MultipleReasons>,
+  >(map: T) {
     return Object.assign(map, {
       toString() {
         return Object.entries(map)
-          .filter(([, reasons]) => reasons instanceof MultipleReasons && reasons.hasAny())
+          .filter(
+            ([, reasons]) =>
+              reasons instanceof MultipleReasons && reasons.hasAny()
+          )
           .map(([key, reasons]) => `"${key}": ${reasons}`)
           .join('\n');
       },

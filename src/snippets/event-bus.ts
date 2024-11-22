@@ -1,6 +1,9 @@
 type Func = (...data: any[]) => unknown | Promise<unknown>;
 
-type ListenerParams<T extends Record<TKey, Func>, TKey extends keyof T> = [T[TKey], any?];
+type ListenerParams<T extends Record<TKey, Func>, TKey extends keyof T> = [
+  T[TKey],
+  any?,
+];
 
 /**
  * @template T ListenerMap type. Pass an object definition which uses all possible event types as keys, and accepted callback types as value.
@@ -14,7 +17,10 @@ type ListenerParams<T extends Record<TKey, Func>, TKey extends keyof T> = [T[TKe
  * ```
  * @template TKey type of allowed keys (you generally don't need to ever define this)
  */
-export class EventBus<T extends Record<string, Func> = Record<string, Func>, TKey extends keyof T = keyof T> {
+export class EventBus<
+  T extends Record<string, Func> = Record<string, Func>,
+  TKey extends keyof T = keyof T,
+> {
   /**
    * Dictionary with a list of [Function,thisParam] tuples for each event key.
    */
@@ -107,9 +113,14 @@ export class EventBus<T extends Record<string, Func> = Record<string, Func>, TKe
     });
   }
 
-  public addListener<K extends TKey = TKey>(eventType: K, func: T[K], $this?: any) {
+  public addListener<K extends TKey = TKey>(
+    eventType: K,
+    func: T[K],
+    $this?: any
+  ) {
     type LP = ListenerParams<T, K>;
-    const currentList = (this.__[eventType] ?? (this.__[eventType] = [])) as LP[];
+    const currentList = (this.__[eventType] ??
+      (this.__[eventType] = [])) as LP[];
     currentList.push([func, $this]);
   }
 
@@ -143,9 +154,16 @@ export class EventBus<T extends Record<string, Func> = Record<string, Func>, TKe
    * TODO: Add either multiple dispatch methods or an options param,
    * to make this functionality optional per 'dispatch' call in the future.
    */
-  public async dispatch<K extends TKey = TKey>(eventType: K, ...data: Parameters<T[K]>) {
+  public async dispatch<K extends TKey = TKey>(
+    eventType: K,
+    ...data: Parameters<T[K]>
+  ) {
     if (!!this.__[eventType]) {
-      await Promise.all(this.__[eventType]!.map(([func, $this]) => func.apply($this, data)).filter(isPromise));
+      await Promise.all(
+        this.__[eventType]!.map(([func, $this]) =>
+          func.apply($this, data)
+        ).filter(isPromise)
+      );
     }
   }
 }

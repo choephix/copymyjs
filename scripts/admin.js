@@ -14,7 +14,7 @@ const colors = {
   red: '\x1b[31m',
   blue: '\x1b[34m',
   reset: '\x1b[0m',
-  bold: '\x1b[1m'
+  bold: '\x1b[1m',
 };
 
 async function parsePostFrontmatter(content) {
@@ -23,31 +23,31 @@ async function parsePostFrontmatter(content) {
 
   const frontmatter = {};
   const lines = frontmatterMatch[1].split('\n');
-  
+
   for (const line of lines) {
     const [key, ...valueParts] = line.split(':');
     if (!key || !valueParts.length) continue;
-    
+
     const value = valueParts.join(':').trim();
     // Remove quotes if present
     frontmatter[key.trim()] = value.replace(/^["']|["']$/g, '');
   }
-  
+
   return frontmatter;
 }
 
 async function getAllPosts() {
   const files = await fs.readdir(POSTS_DIR);
   const showFilenames = process.argv.includes('--byfilename');
-  
+
   const posts = await Promise.all(
-    files.map(async (file) => {
+    files.map(async file => {
       const content = await fs.readFile(path.join(POSTS_DIR, file), 'utf-8');
       const frontmatter = await parsePostFrontmatter(content);
       const isDraft = frontmatter.draft === 'true';
       const publishDate = new Date(frontmatter.publishDate);
       const isScheduled = !isDraft && publishDate > new Date();
-      
+
       return {
         file,
         title: showFilenames ? file.replace('.mdx', '') : frontmatter.title,
@@ -55,7 +55,7 @@ async function getAllPosts() {
         isDraft,
         isScheduled,
         publishDate,
-        willBeDraft: isDraft
+        willBeDraft: isDraft,
       };
     })
   );
@@ -63,7 +63,7 @@ async function getAllPosts() {
   // Sort by category and then by title
   return posts.sort((a, b) => {
     if (a.category !== b.category) return b.category.localeCompare(a.category);
-    return (a.publishDate?.getTime() || 0) - (b.publishDate?.getTime() || 0)
+    return (a.publishDate?.getTime() || 0) - (b.publishDate?.getTime() || 0);
     //return a.file.localeCompare(b.file);
   });
 }
@@ -73,7 +73,7 @@ async function toggleDrafts(selectedFiles, posts) {
     const filePath = path.join(POSTS_DIR, file);
     let content = await fs.readFile(filePath, 'utf-8');
     const post = posts.find(p => p.file === file);
-    
+
     if (/draft:\s*true/.test(content)) {
       content = content.replace(/draft:\s*true/, 'draft: false');
     } else if (/draft:\s*false/.test(content)) {
@@ -84,14 +84,14 @@ async function toggleDrafts(selectedFiles, posts) {
         `$1draft: ${post.willBeDraft}\n`
       );
     }
-    
+
     await fs.writeFile(filePath, content);
   }
 }
 
 function formatChoice(post) {
   let prefix, color;
-  
+
   if (post.willBeDraft) {
     prefix = 'DRAFT';
     color = colors.yellow;
@@ -114,43 +114,46 @@ function formatCategory(category) {
 async function main() {
   const posts = await getAllPosts();
   let currentCategory = '';
-  
+
   const prompt = new enquirer.MultiSelect({
     name: 'posts',
-    message: 'Select posts to toggle draft status (space to select, enter to confirm)',
-    choices: posts.map((post) => {
-      // Add category header if category changes
-      const choices = [];
-      if (currentCategory !== post.category) {
-        currentCategory = post.category;
-        choices.push({
-          role: 'separator',
-          message: formatCategory(post.category)
-        });
-      }
-      
-      choices.push({
-        name: post.file,
-        message: formatChoice(post),
-        onChoice(state, choice) {
-          const post = posts.find(p => p.file === choice.name);
-          if (state.submitted) return;
-          
-          if (choice.enabled) {
-            post.willBeDraft = !post.isDraft;
-          } else {
-            post.willBeDraft = post.isDraft;
-          }
-          
-          choice.message = formatChoice(post);
+    message:
+      'Select posts to toggle draft status (space to select, enter to confirm)',
+    choices: posts
+      .map(post => {
+        // Add category header if category changes
+        const choices = [];
+        if (currentCategory !== post.category) {
+          currentCategory = post.category;
+          choices.push({
+            role: 'separator',
+            message: formatCategory(post.category),
+          });
         }
-      });
-      
-      return choices;
-    }).flat(),
+
+        choices.push({
+          name: post.file,
+          message: formatChoice(post),
+          onChoice(state, choice) {
+            const post = posts.find(p => p.file === choice.name);
+            if (state.submitted) return;
+
+            if (choice.enabled) {
+              post.willBeDraft = !post.isDraft;
+            } else {
+              post.willBeDraft = post.isDraft;
+            }
+
+            choice.message = formatChoice(post);
+          },
+        });
+
+        return choices;
+      })
+      .flat(),
     result(names) {
       return this.map(names);
-    }
+    },
   });
 
   try {
@@ -161,7 +164,9 @@ async function main() {
     }
 
     await toggleDrafts(Object.keys(selected), posts);
-    console.log(`${colors.green}✓ Successfully updated draft status for selected posts!${colors.reset}`);
+    console.log(
+      `${colors.green}✓ Successfully updated draft status for selected posts!${colors.reset}`
+    );
   } catch (err) {
     if (err.message === 'canceled') {
       console.log(`${colors.yellow}Operation cancelled${colors.reset}`);

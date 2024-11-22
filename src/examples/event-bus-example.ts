@@ -1,10 +1,10 @@
 import { EventBus } from '@/snippets/event-bus';
 import { createExampleLayoutBuilder } from './core/createExampleLayoutBuilder';
 
-export default function(container: HTMLElement) {
+export default function (container: HTMLElement) {
   const builder = createExampleLayoutBuilder(container);
   const { logger } = builder;
-  
+
   builder.addHtml(`
     <div class="space-y-6">
       <div class="space-y-4">
@@ -41,9 +41,9 @@ export default function(container: HTMLElement) {
 
   // Create event bus with typed events
   type AppEvents = {
-    'login': () => void;
-    'logout': () => void;
-    'purchase': (amount: number) => void;
+    login: () => void;
+    logout: () => void;
+    purchase: (amount: number) => void;
   };
 
   const bus = new EventBus<AppEvents>();
@@ -54,33 +54,40 @@ export default function(container: HTMLElement) {
     const colors = {
       info: 'text-blue-400',
       success: 'text-green-400',
-      warning: 'text-yellow-400'
+      warning: 'text-yellow-400',
     };
     const time = new Date().toLocaleTimeString();
-    output.innerHTML = `<div class="${colors[type as keyof typeof colors]}">[${time}] ${message}</div>` + output.innerHTML;
+    output.innerHTML =
+      `<div class="${colors[type as keyof typeof colors]}">[${time}] ${message}</div>` +
+      output.innerHTML;
     logger.log(message);
   };
 
   // Event listeners
   const onLogin = () => log('User logged in', 'success');
   const onLogout = () => log('User logged out', 'warning');
-  const onPurchase = (amount: number) => log(`Purchase made: $${amount}`, 'success');
+  const onPurchase = (amount: number) =>
+    log(`Purchase made: $${amount}`, 'success');
 
   // Toggle event listeners based on checkboxes
-  const logEvents = builder.container.querySelector('#logEvents') as HTMLInputElement;
-  const trackPurchases = builder.container.querySelector('#trackPurchases') as HTMLInputElement;
+  const logEvents = builder.container.querySelector(
+    '#logEvents'
+  ) as HTMLInputElement;
+  const trackPurchases = builder.container.querySelector(
+    '#trackPurchases'
+  ) as HTMLInputElement;
 
   logEvents.addEventListener('change', () => {
     if (logEvents.checked) {
       bus.on({
         login: onLogin,
-        logout: onLogout
+        logout: onLogout,
       });
       log('Started logging auth events', 'info');
     } else {
       bus.off({
         login: onLogin,
-        logout: onLogout
+        logout: onLogout,
       });
       log('Stopped logging auth events', 'info');
     }
@@ -105,15 +112,17 @@ export default function(container: HTMLElement) {
     bus.dispatch('logout');
   });
 
-  builder.container.querySelector('#purchase')?.addEventListener('click', () => {
-    const amount = Math.floor(Math.random() * 100) + 1;
-    bus.dispatch('purchase', amount);
-  });
+  builder.container
+    .querySelector('#purchase')
+    ?.addEventListener('click', () => {
+      const amount = Math.floor(Math.random() * 100) + 1;
+      bus.dispatch('purchase', amount);
+    });
 
   // Initial setup
   bus.on({
     login: onLogin,
     logout: onLogout,
-    purchase: onPurchase
+    purchase: onPurchase,
   });
 }

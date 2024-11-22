@@ -9,7 +9,7 @@ export function debounce<T extends (...args: any[]) => any>(
   wait: number
 ): (...args: Parameters<T>) => void {
   let timeout: ReturnType<typeof setTimeout>;
-  return function(...args: Parameters<T>) {
+  return function (...args: Parameters<T>) {
     clearTimeout(timeout);
     timeout = setTimeout(() => fn(...args), wait);
   };

@@ -4,10 +4,9 @@
  * @param windowRef Window reference (useful for testing)
  * @returns Proxy object that reads/writes to URL parameters
  */
-export function createUrlParamsProxy<T extends { [key: string]: any; [key: symbol]: never }>(
-  defaults: T,
-  windowRef = window
-) {
+export function createUrlParamsProxy<
+  T extends { [key: string]: any; [key: symbol]: never },
+>(defaults: T, windowRef = window) {
   const queryString = windowRef.location.search;
   const urlParamsObject = new URLSearchParams(queryString);
 
@@ -40,7 +39,8 @@ export function createUrlParamsProxy<T extends { [key: string]: any; [key: symbo
       }
 
       const { protocol, host, pathname } = windowRef.location;
-      const newUrl = protocol + '//' + host + pathname + '?' + urlParamsObject.toString();
+      const newUrl =
+        protocol + '//' + host + pathname + '?' + urlParamsObject.toString();
       windowRef.history.replaceState({ path: newUrl }, '', newUrl);
 
       return true;
@@ -50,7 +50,8 @@ export function createUrlParamsProxy<T extends { [key: string]: any; [key: symbo
       urlParamsObject.delete(String(p));
 
       const { protocol, host, pathname } = windowRef.location;
-      const newUrl = protocol + '//' + host + pathname + '?' + urlParamsObject.toString();
+      const newUrl =
+        protocol + '//' + host + pathname + '?' + urlParamsObject.toString();
       windowRef.history.replaceState({ path: newUrl }, '', newUrl);
 
       delete (target as any)[p];

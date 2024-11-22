@@ -22,10 +22,10 @@ export function createMulticaster() {
   };
 
   multicaster.sub = (
-    callback: MulticasterSubscriber["callback"],
+    callback: MulticasterSubscriber['callback'],
     priority = 0
   ) => {
-    const insertIndex = subscribers.findIndex((sub) => sub.priority < priority);
+    const insertIndex = subscribers.findIndex(sub => sub.priority < priority);
     const newSubscriber = { callback, priority };
 
     if (insertIndex === -1) {
@@ -37,8 +37,8 @@ export function createMulticaster() {
     return () => multicaster.unsub(callback);
   };
 
-  multicaster.unsub = (callback: MulticasterSubscriber["callback"]) => {
-    const index = subscribers.findIndex((sub) => sub.callback === callback);
+  multicaster.unsub = (callback: MulticasterSubscriber['callback']) => {
+    const index = subscribers.findIndex(sub => sub.callback === callback);
     if (index !== -1) {
       subscribers.splice(index, 1);
     }

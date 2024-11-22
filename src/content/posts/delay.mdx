@@ -1,9 +1,9 @@
 ---
-title: "Delay Function for Async Operations"
-publishDate: "2024-03-20"
-description: "A simple utility to create delays in async operations"
+title: 'Delay Function for Async Operations'
+publishDate: '2024-03-20'
+description: 'A simple utility to create delays in async operations'
 draft: true
-category: "helpers"
+category: 'helpers'
 version: 0
 ---
 
@@ -48,6 +48,7 @@ async function fetchWithRetry(url: string, maxRetries = 3) {
 ## Best Practices
 
 When using delays in production:
+
 - Avoid unnecessary delays in critical paths
 - Use exponential backoff for retries
 - Consider user experience when adding delays

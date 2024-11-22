@@ -1,10 +1,10 @@
 import { MultipleReasons } from '@/snippets/many-reasons';
 import { createExampleLayoutBuilder } from './core/createExampleLayoutBuilder';
 
-export default function(container: HTMLElement) {
+export default function (container: HTMLElement) {
   const builder = createExampleLayoutBuilder(container);
   const { logger } = builder;
-  
+
   builder.addHtml(`
     <div class="space-y-6">
       <!-- Loading Example -->
@@ -52,58 +52,73 @@ export default function(container: HTMLElement) {
 
   // Loading Example
   const loadingReasons = new MultipleReasons();
-  const loadingIndicator = builder.container.querySelector('#loadingIndicator')!;
+  const loadingIndicator =
+    builder.container.querySelector('#loadingIndicator')!;
   const loadingReasonsEl = builder.container.querySelector('#loadingReasons')!;
 
   loadingReasons.on({
-    change: (hasReasons) => {
+    change: hasReasons => {
       loadingIndicator.classList.toggle('hidden', !hasReasons);
-      loadingReasonsEl.textContent = hasReasons ? 
-        `Current reasons: ${loadingReasons}` : 
-        'No active loading operations';
-      logger.log(hasReasons ? `Loading: ${loadingReasons}` : 'Loading complete');
-    }
+      loadingReasonsEl.textContent = hasReasons
+        ? `Current reasons: ${loadingReasons}`
+        : 'No active loading operations';
+      logger.log(
+        hasReasons ? `Loading: ${loadingReasons}` : 'Loading complete'
+      );
+    },
   });
 
-  builder.container.querySelector('#loadData')?.addEventListener('click', async () => {
-    const cleanup = loadingReasons.add('Loading data...');
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    cleanup();
-  });
+  builder.container
+    .querySelector('#loadData')
+    ?.addEventListener('click', async () => {
+      const cleanup = loadingReasons.add('Loading data...');
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      cleanup();
+    });
 
-  builder.container.querySelector('#loadImages')?.addEventListener('click', async () => {
-    const cleanup = loadingReasons.add('Loading images...');
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    cleanup();
-  });
+  builder.container
+    .querySelector('#loadImages')
+    ?.addEventListener('click', async () => {
+      const cleanup = loadingReasons.add('Loading images...');
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      cleanup();
+    });
 
   // Button State Example
   const submitReasons = new MultipleReasons();
-  const submitButton = builder.container.querySelector('#submitButton') as HTMLButtonElement;
+  const submitButton = builder.container.querySelector(
+    '#submitButton'
+  ) as HTMLButtonElement;
   const submitReasonsEl = builder.container.querySelector('#submitReasons')!;
 
   let hasValidationError = false;
   let hasPermissionError = false;
 
   submitReasons.on({
-    change: (hasReasons) => {
+    change: hasReasons => {
       submitButton.disabled = hasReasons;
-      submitReasonsEl.textContent = hasReasons ? 
-        `Can't submit: ${submitReasons}` : 
-        'Ready to submit';
-      logger.log(hasReasons ? `Submit blocked: ${submitReasons}` : 'Submit enabled');
-    }
+      submitReasonsEl.textContent = hasReasons
+        ? `Can't submit: ${submitReasons}`
+        : 'Ready to submit';
+      logger.log(
+        hasReasons ? `Submit blocked: ${submitReasons}` : 'Submit enabled'
+      );
+    },
   });
 
-  builder.container.querySelector('#toggleValidation')?.addEventListener('click', () => {
-    hasValidationError = !hasValidationError;
-    submitReasons.set('Validation error', hasValidationError);
-  });
+  builder.container
+    .querySelector('#toggleValidation')
+    ?.addEventListener('click', () => {
+      hasValidationError = !hasValidationError;
+      submitReasons.set('Validation error', hasValidationError);
+    });
 
-  builder.container.querySelector('#togglePermission')?.addEventListener('click', () => {
-    hasPermissionError = !hasPermissionError;
-    submitReasons.set('Permission denied', hasPermissionError);
-  });
+  builder.container
+    .querySelector('#togglePermission')
+    ?.addEventListener('click', () => {
+      hasPermissionError = !hasPermissionError;
+      submitReasons.set('Permission denied', hasPermissionError);
+    });
 
   submitButton.addEventListener('click', () => {
     if (!submitReasons.hasAny()) {

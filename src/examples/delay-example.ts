@@ -1,10 +1,10 @@
 import { delayMs } from '@/snippets/async-delay';
 import { createExampleLayoutBuilder } from './core/createExampleLayoutBuilder';
 
-export default function(container: HTMLElement) {
+export default function (container: HTMLElement) {
   const builder = createExampleLayoutBuilder(container);
   const { logger } = builder;
-  
+
   builder.addHtml(`
     <div class="space-y-4">
       <div class="flex gap-4">
@@ -21,17 +21,17 @@ export default function(container: HTMLElement) {
 
   async function runDemo() {
     if (buttonEl.hasAttribute('disabled')) return;
-    
+
     buttonEl.setAttribute('disabled', 'true');
     statusEl.textContent = 'Starting...';
     logger.log('Starting countdown');
-    
+
     for (let i = 3; i >= 1; i--) {
       await delayMs(1000);
       statusEl.textContent = `${i}...`;
       logger.log(`Countdown: ${i}`);
     }
-    
+
     await delayMs(1000);
     statusEl.textContent = 'Done!';
     buttonEl.removeAttribute('disabled');

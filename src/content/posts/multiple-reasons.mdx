@@ -1,9 +1,9 @@
 ---
-title: "MultipleReasons: Advanced State Management"
-publishDate: "2024-03-21"
-description: "A powerful utility for managing multiple state conditions"
+title: 'MultipleReasons: Advanced State Management'
+publishDate: '2024-03-21'
+description: 'A powerful utility for managing multiple state conditions'
 draft: true
-category: "helpers"
+category: 'helpers'
 version: 1
 ---
 
@@ -59,10 +59,10 @@ async function loadImages() {
 
 // React to changes
 loadingReasons.on({
-  change: (hasReasons) => {
+  change: hasReasons => {
     showLoadingSpinner(hasReasons);
     console.log('Current reasons:', loadingReasons.toString());
-  }
+  },
 });
 ```
 
@@ -73,9 +73,9 @@ const submitReasons = new MultipleReasons();
 
 // Disable button when there are any reasons
 submitReasons.on({
-  change: (hasReasons) => {
+  change: hasReasons => {
     submitButton.disabled = hasReasons;
-  }
+  },
 });
 
 // Add/remove reasons based on conditions
@@ -98,10 +98,7 @@ const userLoadingReasons = new MultipleReasons();
 const profileLoadingReasons = new MultipleReasons();
 
 // Make global loading affect all child loaders
-globalLoadingReasons.makeParentTo(
-  userLoadingReasons,
-  profileLoadingReasons
-);
+globalLoadingReasons.makeParentTo(userLoadingReasons, profileLoadingReasons);
 
 // Now when globalLoadingReasons has any reasons,
 // all children will also show as having reasons
@@ -110,12 +107,14 @@ globalLoadingReasons.makeParentTo(
 ## Best Practices
 
 1. **Use Descriptive Identifiers**
+
    ```typescript
-   reasons.add('fetchingUserData');  // Good
-   reasons.add('loading');           // Too vague
+   reasons.add('fetchingUserData'); // Good
+   reasons.add('loading'); // Too vague
    ```
 
 2. **Clean Up Properly**
+
    ```typescript
    class Component {
      private reasons = new MultipleReasons();
@@ -123,9 +122,7 @@ globalLoadingReasons.makeParentTo(
 
      init() {
        // Store cleanup functions
-       this.cleanup.push(
-         this.reasons.add('initializing')
-       );
+       this.cleanup.push(this.reasons.add('initializing'));
      }
 
      destroy() {
@@ -138,26 +135,26 @@ globalLoadingReasons.makeParentTo(
 3. **Use with Async Operations**
    ```typescript
    async function loadData() {
-     return reasons.addDuring(
-       'loadingData',
-       fetch('/api/data')
-     );
+     return reasons.addDuring('loadingData', fetch('/api/data'));
    }
    ```
 
 ## Common Use Cases
 
 1. **Loading States**
+
    - Multiple concurrent API calls
    - Resource loading (images, scripts)
    - Initialization processes
 
 2. **Form Validation**
+
    - Multiple validation rules
    - Async validation
    - Cross-field validation
 
 3. **Permission Systems**
+
    - Multiple permission requirements
    - Role-based access
    - Feature flags
@@ -176,9 +173,9 @@ const reasons = new MultipleReasons();
 const params = createUrlParamsProxy({ modal: false });
 
 reasons.on({
-  change: (hasReasons) => {
+  change: hasReasons => {
     params.modal = hasReasons;
-  }
+  },
 });
 ```
 
@@ -188,7 +185,7 @@ reasons.on({
 const enum LoadingReason {
   UserData = 'userData',
   Settings = 'settings',
-  Profile = 'profile'
+  Profile = 'profile',
 }
 
 const reasons = new MultipleReasons();
@@ -200,17 +197,17 @@ reasons.add(LoadingReason.UserData);
 ```typescript
 async function initializeApp() {
   const startup = new MultipleReasons();
-  
+
   // Add initial reasons
   startup.add('configLoading');
   startup.add('userLoading');
-  
+
   // Load in parallel
   await Promise.all([
     loadConfig().then(() => startup.remove('configLoading')),
-    loadUser().then(() => startup.remove('userLoading'))
+    loadUser().then(() => startup.remove('userLoading')),
   ]);
-  
+
   // Wait until everything is ready
   await startup.waitUntilEmpty();
   console.log('App ready!');

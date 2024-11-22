@@ -1,9 +1,9 @@
 ---
-title: "Type-Safe Event Bus"
-publishDate: "2024-03-21"
-description: "A powerful, type-safe event bus implementation for TypeScript"
+title: 'Type-Safe Event Bus'
+publishDate: '2024-03-21'
+description: 'A powerful, type-safe event bus implementation for TypeScript'
 draft: true
-category: "helpers"
+category: 'helpers'
 version: 1
 ---
 
@@ -39,16 +39,16 @@ Try out the event bus with a simple application flow:
 
 ```typescript
 type AppEvents = {
-  'userLogin': (userId: string) => void;
-  'notification': (message: string, type: 'info' | 'error') => void;
+  userLogin: (userId: string) => void;
+  notification: (message: string, type: 'info' | 'error') => void;
 };
 
 const bus = new EventBus<AppEvents>();
 
 // Add listeners
 bus.on({
-  userLogin: (userId) => console.log(`User ${userId} logged in`),
-  notification: (message, type) => showNotification(message, type)
+  userLogin: userId => console.log(`User ${userId} logged in`),
+  notification: (message, type) => showNotification(message, type),
 });
 
 // Dispatch events
@@ -60,8 +60,8 @@ bus.dispatch('notification', 'Welcome back!', 'info');
 
 ```typescript
 type AsyncEvents = {
-  'dataLoad': () => Promise<void>;
-  'save': (data: any) => Promise<void>;
+  dataLoad: () => Promise<void>;
+  save: (data: any) => Promise<void>;
 };
 
 const bus = new EventBus<AsyncEvents>();
@@ -70,7 +70,7 @@ bus.on({
   dataLoad: async () => {
     const data = await fetchData();
     updateUI(data);
-  }
+  },
 });
 
 // Async dispatch
@@ -81,7 +81,7 @@ await bus.dispatch('dataLoad');
 
 ```typescript
 const bus = new EventBus<{
-  'ready': () => void;
+  ready: () => void;
 }>();
 
 async function initApp() {
@@ -97,13 +97,14 @@ bus.dispatch('ready');
 ## Best Practices
 
 1. **Define Event Types**
+
    ```typescript
    // Create an enum or const object for event names
    const AppEvents = {
      LOGIN: 'login',
-     LOGOUT: 'logout'
+     LOGOUT: 'logout',
    } as const;
-   
+
    // Use it in your event type
    type Events = {
      [AppEvents.LOGIN]: (user: User) => void;
@@ -112,15 +113,18 @@ bus.dispatch('ready');
    ```
 
 2. **Cleanup Listeners**
+
    ```typescript
    class Component {
      private cleanup: (() => void)[] = [];
 
      init() {
        // Store cleanup function
-       this.cleanup.push(bus.on({
-         'event': this.handler
-       }));
+       this.cleanup.push(
+         bus.on({
+           event: this.handler,
+         })
+       );
      }
 
      destroy() {
@@ -131,6 +135,7 @@ bus.dispatch('ready');
    ```
 
 3. **Group Related Events**
+
    ```typescript
    type UserEvents = {
      'user:login': () => void;
@@ -149,16 +154,19 @@ bus.dispatch('ready');
 ## Common Use Cases
 
 1. **Application State Management**
+
    - User authentication events
    - Theme changes
    - Global notifications
 
 2. **Component Communication**
+
    - Cross-component updates
    - Parent-child communication
    - Sibling component interaction
 
 3. **Plugin Systems**
+
    - Plugin initialization
    - Feature toggling
    - Extension point handling

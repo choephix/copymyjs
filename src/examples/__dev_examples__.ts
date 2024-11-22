@@ -7,7 +7,7 @@ export function example1(container: HTMLElement) {
 
   const builder = createExampleLayoutBuilder(container);
   const { logger } = builder;
-  
+
   builder.addHtml(`
     <div class="flex gap-4 items-center">
       <button id="colorBtn" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">

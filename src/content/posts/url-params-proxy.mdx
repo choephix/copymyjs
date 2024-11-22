@@ -1,9 +1,9 @@
 ---
-title: "URL Parameters Proxy"
-publishDate: "2024-12-21"
-description: "Sync state with URL parameters using a Proxy object"
+title: 'URL Parameters Proxy'
+publishDate: '2024-12-21'
+description: 'Sync state with URL parameters using a Proxy object'
 draft: true
-category: "helpers"
+category: 'helpers'
 version: 1
 ---
 
@@ -40,7 +40,7 @@ Try it out by setting and deleting URL parameters:
 const params = createUrlParamsProxy({
   theme: 'light',
   page: 1,
-  showSidebar: true
+  showSidebar: true,
 });
 
 // Read values (falls back to defaults if not in URL)
@@ -60,7 +60,7 @@ delete params.showSidebar;
 ```typescript
 const params = createUrlParamsProxy({
   filters: { category: 'all', active: true },
-  sort: { field: 'name', order: 'asc' }
+  sort: { field: 'name', order: 'asc' },
 });
 
 // Objects are automatically serialized/deserialized
@@ -82,7 +82,7 @@ interface AppParams {
 const params = createUrlParamsProxy<AppParams>({
   theme: 'light',
   page: 1,
-  filters: { category: 'all', active: true }
+  filters: { category: 'all', active: true },
 });
 
 // TypeScript error: invalid theme value

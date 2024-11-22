@@ -7,7 +7,7 @@ export function createSimpleMulticaster() {
 
   const multicaster = function __multicasterEmit(...args: any[]) {
     let result = undefined;
-    subscribers.forEach(callback => result = callback(...args));
+    subscribers.forEach(callback => (result = callback(...args)));
     return result;
   };
 

@@ -1,10 +1,10 @@
 import { clamp } from '@/snippets/number-clamp';
 import { createExampleLayoutBuilder } from './core/createExampleLayoutBuilder';
 
-export default function(container: HTMLElement) {
+export default function (container: HTMLElement) {
   const builder = createExampleLayoutBuilder(container);
   const { logger } = builder;
-  
+
   builder.addHtml(`
     <div class="space-y-4">
       <div class="space-y-2">
@@ -24,7 +24,7 @@ export default function(container: HTMLElement) {
   const input = builder.container.querySelector('#input')!;
   const result = builder.container.querySelector('#result')!;
 
-  input.addEventListener('input', (e) => {
+  input.addEventListener('input', e => {
     const value = parseInt((e.target as HTMLInputElement).value);
     const clamped = clamp(value, 25, 75);
     result.textContent = String(clamped);

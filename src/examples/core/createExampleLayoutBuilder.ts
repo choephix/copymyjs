@@ -10,19 +10,21 @@ interface ExampleLayoutBuilder {
   addHtml: (html: string) => void;
 }
 
-export function createExampleLayoutBuilder(parentElement: HTMLElement): ExampleLayoutBuilder {
+export function createExampleLayoutBuilder(
+  parentElement: HTMLElement
+): ExampleLayoutBuilder {
   // Single wrapper with flex row
   const wrapper = document.createElement('div');
   wrapper.className = 'flex flex-row gap-4 overflow-hidden';
   parentElement.appendChild(wrapper);
-  
+
   // Main container that grows naturally
   const mainContainer = document.createElement('div');
   mainContainer.className = 'space-y-4 flex-1 min-h-0 p-6';
   wrapper.appendChild(mainContainer);
 
   let logContainer: HTMLElement | null = null;
-  
+
   // Create lazy logger that initializes UI on first use
   const lazyLogger: Logger = {
     log: createLazyLogMethod('log'),
@@ -36,14 +38,14 @@ export function createExampleLayoutBuilder(parentElement: HTMLElement): ExampleL
         logContainer = document.createElement('div');
         logContainer.className =
           'w-64 p-2 bg-[#19233a] font-mono text-xs ' +
-          'shrink-0 overflow-y-auto self-stretch max-h-[200px] ' + 
+          'shrink-0 overflow-y-auto self-stretch max-h-[200px] ' +
           'outline outline-1 outline-gray-700 ' +
           'animate-slide-in scrollbar-slim';
         wrapper.appendChild(logContainer);
-        
+
         Object.assign(lazyLogger, createLoggerInterface(logContainer));
       }
-      
+
       lazyLogger[type](message);
     };
   }
@@ -60,11 +62,12 @@ export function createExampleLayoutBuilder(parentElement: HTMLElement): ExampleL
 function createLoggerInterface(logElement: HTMLElement): Logger {
   const createLogEntry = (message: string, type: 'log' | 'warn' | 'error') => {
     const entry = document.createElement('div');
-    entry.className = {
-      log: 'text-gray-700 dark:text-gray-300',
-      warn: 'text-yellow-600 dark:text-yellow-400',
-      error: 'text-red-600 dark:text-red-400',
-    }[type] + ' leading-tight py-0.5';
+    entry.className =
+      {
+        log: 'text-gray-700 dark:text-gray-300',
+        warn: 'text-yellow-600 dark:text-yellow-400',
+        error: 'text-red-600 dark:text-red-400',
+      }[type] + ' leading-tight py-0.5';
     entry.textContent = message;
     logElement.appendChild(entry);
 

@@ -12,11 +12,11 @@ export default {
         'slide-in': {
           '0%': { transform: 'translateX(100%)' },
           '100%': { transform: 'translateX(0)' },
-        }
+        },
       },
       animation: {
         'slide-in': 'slide-in 0.15s ease-in-out',
-      }
+      },
     },
   },
   plugins: [
@@ -40,8 +40,8 @@ export default {
           '&::-webkit-scrollbar-thumb:hover': {
             background: '#6B7280',
           },
-          'scrollbarWidth': 'thin',
-          'scrollbarColor': '#4B5563 transparent',
+          scrollbarWidth: 'thin',
+          scrollbarColor: '#4B5563 transparent',
         },
       };
       addUtilities(newUtilities, ['responsive', 'hover']);
@@ -55,4 +55,4 @@ export default {
     'border-yellow-500',
     'border-blue-500',
   ],
-}
+};

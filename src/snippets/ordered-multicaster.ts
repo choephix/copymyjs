@@ -20,13 +20,16 @@ export function createOrderedMulticaster() {
 
   const multicaster = function __multicasterEmit(...args: any[]) {
     let result = undefined;
-    subscribers.forEach(({ callback }) => result = callback(...args));
+    subscribers.forEach(({ callback }) => (result = callback(...args)));
     return result;
   };
 
-  const addSubscriber = (callback: (...args: any[]) => unknown, position: Position) => {
+  const addSubscriber = (
+    callback: (...args: any[]) => unknown,
+    position: Position
+  ) => {
     const newSubscriber = { callback, position };
-    
+
     if (position === 'before') {
       subscribers.unshift(newSubscriber);
     } else if (position === 'after') {
@@ -43,13 +46,13 @@ export function createOrderedMulticaster() {
     return () => multicaster.unsub(callback);
   };
 
-  multicaster.subBefore = (callback: (...args: any[]) => unknown) => 
+  multicaster.subBefore = (callback: (...args: any[]) => unknown) =>
     addSubscriber(callback, 'before');
 
-  multicaster.sub = (callback: (...args: any[]) => unknown) => 
+  multicaster.sub = (callback: (...args: any[]) => unknown) =>
     addSubscriber(callback, 'normal');
 
-  multicaster.subAfter = (callback: (...args: any[]) => unknown) => 
+  multicaster.subAfter = (callback: (...args: any[]) => unknown) =>
     addSubscriber(callback, 'after');
 
   multicaster.unsub = (callback: (...args: any[]) => unknown) => {

@@ -1,13 +1,13 @@
 import { unique } from '@/snippets/array-unique';
 import { createExampleLayoutBuilder } from './core/createExampleLayoutBuilder';
 
-export default function(container: HTMLElement) {
+export default function (container: HTMLElement) {
   const builder = createExampleLayoutBuilder(container);
   const { logger } = builder;
 
   const numbers = [1, 2, 2, 3, 3, 3, 4, 5, 5];
   const uniqueNumbers = unique(numbers);
-  
+
   logger.log(`Original array: [${numbers.join(', ')}]`);
   logger.log(`Unique values: [${uniqueNumbers.join(', ')}]`);
 

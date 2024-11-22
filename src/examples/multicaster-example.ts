@@ -3,10 +3,10 @@ import { createSimpleMulticaster } from '@/snippets/simple-multicaster';
 import { createOrderedMulticaster } from '@/snippets/ordered-multicaster';
 import { createExampleLayoutBuilder } from './core/createExampleLayoutBuilder';
 
-export default function(container: HTMLElement) {
+export default function (container: HTMLElement) {
   const builder = createExampleLayoutBuilder(container);
   const { logger } = builder;
-  
+
   builder.addHtml(`
     <div class="space-y-8">
       <!-- Priority-based Multicaster -->
@@ -57,12 +57,12 @@ export default function(container: HTMLElement) {
   const output1 = builder.container.querySelector('#output1')!;
   const multicaster1 = createMulticaster();
 
-  multicaster1.sub((msg) => {
+  multicaster1.sub(msg => {
     output1.innerHTML += `<div class="text-blue-400">Normal (0): ${msg}</div>`;
     logger.log(`Priority 0: ${msg}`);
   });
 
-  multicaster1.sub((msg) => {
+  multicaster1.sub(msg => {
     output1.innerHTML += `<div class="text-green-400">High (1): ${msg}</div>`;
     logger.log(`Priority 1: ${msg}`);
   }, 1);
@@ -74,7 +74,8 @@ export default function(container: HTMLElement) {
 
   builder.container.querySelector('#clear1')?.addEventListener('click', () => {
     multicaster1.clear();
-    output1.innerHTML = '<div class="text-gray-400">All subscribers cleared</div>';
+    output1.innerHTML =
+      '<div class="text-gray-400">All subscribers cleared</div>';
     logger.log('Priority multicaster cleared');
   });
 
@@ -82,12 +83,12 @@ export default function(container: HTMLElement) {
   const output2 = builder.container.querySelector('#output2')!;
   const multicaster2 = createSimpleMulticaster();
 
-  multicaster2.sub((msg) => {
+  multicaster2.sub(msg => {
     output2.innerHTML += `<div class="text-blue-400">First: ${msg}</div>`;
     logger.log(`Simple First: ${msg}`);
   });
 
-  multicaster2.sub((msg) => {
+  multicaster2.sub(msg => {
     output2.innerHTML += `<div class="text-green-400">Second: ${msg}</div>`;
     logger.log(`Simple Second: ${msg}`);
   });
@@ -99,7 +100,8 @@ export default function(container: HTMLElement) {
 
   builder.container.querySelector('#clear2')?.addEventListener('click', () => {
     multicaster2.clear();
-    output2.innerHTML = '<div class="text-gray-400">All subscribers cleared</div>';
+    output2.innerHTML =
+      '<div class="text-gray-400">All subscribers cleared</div>';
     logger.log('Simple multicaster cleared');
   });
 
@@ -107,17 +109,17 @@ export default function(container: HTMLElement) {
   const output3 = builder.container.querySelector('#output3')!;
   const multicaster3 = createOrderedMulticaster();
 
-  multicaster3.subBefore((msg) => {
+  multicaster3.subBefore(msg => {
     output3.innerHTML += `<div class="text-yellow-400">Before: ${msg}</div>`;
     logger.log(`Before: ${msg}`);
   });
 
-  multicaster3.sub((msg) => {
+  multicaster3.sub(msg => {
     output3.innerHTML += `<div class="text-blue-400">Normal: ${msg}</div>`;
     logger.log(`Normal: ${msg}`);
   });
 
-  multicaster3.subAfter((msg) => {
+  multicaster3.subAfter(msg => {
     output3.innerHTML += `<div class="text-green-400">After: ${msg}</div>`;
     logger.log(`After: ${msg}`);
   });
@@ -129,7 +131,8 @@ export default function(container: HTMLElement) {
 
   builder.container.querySelector('#clear3')?.addEventListener('click', () => {
     multicaster3.clear();
-    output3.innerHTML = '<div class="text-gray-400">All subscribers cleared</div>';
+    output3.innerHTML =
+      '<div class="text-gray-400">All subscribers cleared</div>';
     logger.log('Ordered multicaster cleared');
   });
 }

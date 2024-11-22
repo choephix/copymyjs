@@ -1,7 +1,7 @@
 import { pick } from '@/snippets/object-pick';
 import { createExampleLayoutBuilder } from './core/createExampleLayoutBuilder';
 
-export default function(container: HTMLElement) {
+export default function (container: HTMLElement) {
   const builder = createExampleLayoutBuilder(container);
   const { logger } = builder;
 
@@ -10,7 +10,7 @@ export default function(container: HTMLElement) {
     name: 'John Doe',
     email: 'john@example.com',
     password: 'secret123',
-    createdAt: '2024-03-20'
+    createdAt: '2024-03-20',
   };
 
   const publicInfo = pick(user, ['name', 'email']);

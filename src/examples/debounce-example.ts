@@ -1,10 +1,10 @@
 import { debounce } from '@/snippets/function-debounce';
 import { createExampleLayoutBuilder } from './core/createExampleLayoutBuilder';
 
-export default function(container: HTMLElement) {
+export default function (container: HTMLElement) {
   const builder = createExampleLayoutBuilder(container);
   const { logger } = builder;
-  
+
   builder.addHtml(`
     <div class="space-y-4">
       <div class="space-y-2">
@@ -30,7 +30,7 @@ export default function(container: HTMLElement) {
     logger.log(`Debounced value: ${value}`);
   }, 500);
 
-  input.addEventListener('input', (e) => {
+  input.addEventListener('input', e => {
     const value = (e.target as HTMLInputElement).value;
     logger.log(`Input value: ${value}`);
     updateResult(value);

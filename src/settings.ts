@@ -1,3 +1,3 @@
 export const settings = {
-  categoriesOrder: ['helpers', 'classic']
+  categoriesOrder: ['helpers', 'classic'],
 };

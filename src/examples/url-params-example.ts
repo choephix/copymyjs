@@ -1,10 +1,10 @@
 import { createUrlParamsProxy } from '@/snippets/url-params-proxy';
 import { createExampleLayoutBuilder } from './core/createExampleLayoutBuilder';
 
-export default function(container: HTMLElement) {
+export default function (container: HTMLElement) {
   const builder = createExampleLayoutBuilder(container);
   const { logger } = builder;
-  
+
   builder.addHtml(`
     <div class="space-y-6">
       <div class="space-y-4">
@@ -60,7 +60,7 @@ export default function(container: HTMLElement) {
   const params = createUrlParamsProxy({
     theme: 'light',
     page: 1,
-    filters: { active: true }
+    filters: { active: true },
   });
 
   const updateOutput = () => {
@@ -73,52 +73,62 @@ export default function(container: HTMLElement) {
   updateOutput();
 
   // Set parameter
-  builder.container.querySelector('#setParam')?.addEventListener('click', () => {
-    const nameInput = builder.container.querySelector('#paramName') as HTMLInputElement;
-    const valueInput = builder.container.querySelector('#paramValue') as HTMLInputElement;
-    
-    const name = nameInput.value.trim();
-    let value: any = valueInput.value.trim();
+  builder.container
+    .querySelector('#setParam')
+    ?.addEventListener('click', () => {
+      const nameInput = builder.container.querySelector(
+        '#paramName'
+      ) as HTMLInputElement;
+      const valueInput = builder.container.querySelector(
+        '#paramValue'
+      ) as HTMLInputElement;
 
-    if (!name) return;
+      const name = nameInput.value.trim();
+      let value: any = valueInput.value.trim();
 
-    // Try to parse as JSON if it looks like an object or array
-    if (value.startsWith('{') || value.startsWith('[')) {
-      try {
-        value = JSON.parse(value);
-      } catch (e) {
-        // Keep as string if parsing fails
+      if (!name) return;
+
+      // Try to parse as JSON if it looks like an object or array
+      if (value.startsWith('{') || value.startsWith('[')) {
+        try {
+          value = JSON.parse(value);
+        } catch (e) {
+          // Keep as string if parsing fails
+        }
       }
-    }
-    // Try to parse as number
-    else if (!isNaN(Number(value))) {
-      value = Number(value);
-    }
-    // Parse booleans
-    else if (value === 'true') value = true;
-    else if (value === 'false') value = false;
+      // Try to parse as number
+      else if (!isNaN(Number(value))) {
+        value = Number(value);
+      }
+      // Parse booleans
+      else if (value === 'true') value = true;
+      else if (value === 'false') value = false;
 
-    (params as any)[name] = value;
-    logger.log(`Set parameter ${name} = ${JSON.stringify(value)}`);
-    updateOutput();
+      (params as any)[name] = value;
+      logger.log(`Set parameter ${name} = ${JSON.stringify(value)}`);
+      updateOutput();
 
-    // Clear inputs
-    nameInput.value = '';
-    valueInput.value = '';
-  });
+      // Clear inputs
+      nameInput.value = '';
+      valueInput.value = '';
+    });
 
   // Delete parameter
-  builder.container.querySelector('#deleteParam')?.addEventListener('click', () => {
-    const input = builder.container.querySelector('#deleteParamName') as HTMLInputElement;
-    const name = input.value.trim();
+  builder.container
+    .querySelector('#deleteParam')
+    ?.addEventListener('click', () => {
+      const input = builder.container.querySelector(
+        '#deleteParamName'
+      ) as HTMLInputElement;
+      const name = input.value.trim();
 
-    if (!name) return;
+      if (!name) return;
 
-    delete (params as any)[name];
-    logger.log(`Deleted parameter ${name}`);
-    updateOutput();
+      delete (params as any)[name];
+      logger.log(`Deleted parameter ${name}`);
+      updateOutput();
 
-    // Clear input
-    input.value = '';
-  });
+      // Clear input
+      input.value = '';
+    });
 }
