@@ -3,11 +3,11 @@ import { Copy } from 'lucide-astro';
 import { Code } from 'astro:components';
 
 import { stripComments } from '@/utils/code/stripComments';
-import { stripTypes } from '@/utils/code/stripTypes';
+// import { stripTypes } from '@/utils/code/stripTypes';
 import ErrorBanner from './ErrorBanner.astro';
 
-const shouldStripTypes = false;
-const shouldStripComments = true;
+// const shouldStripTypes = false;
+// const shouldStripComments = true;
 
 interface Props {
   file: string;
@@ -23,11 +23,16 @@ const snippetFiles = import.meta.glob<string>('/src/snippets/**/*.ts', {
 const filePath = `/src/snippets/${file}`;
 
 let code = '';
+let codeNoComments = '';
+// let codeNoTypes = '';
+// let codeNoCommentsNoTypes = '';
 let fileExists = false;
+
 if (filePath in snippetFiles) {
   code = await snippetFiles[filePath]();
-  if (shouldStripTypes) code = stripTypes(code);
-  if (shouldStripComments) code = stripComments(code);
+  codeNoComments = stripComments(code);
+  // codeNoTypes = stripTypes(code);
+  // codeNoCommentsNoTypes = stripComments(stripTypes(code));
   fileExists = true;
 }
 ---
@@ -42,10 +47,10 @@ if (filePath in snippetFiles) {
       >
         <Copy class='w-5 h-5 text-gray-400' />
       </button>
-      {/* <Code code={code} lang='ts' theme='tokyo-night' /> */}
-      {/* <Code code={code} lang='ts' theme='houston' /> */}
-      <Code code={code} lang='ts' theme='material-theme-ocean' />
-      {/* <Code code={code} lang='ts' theme='github-dark-default' /> */}
+      {/* <Code code={codeNoComments} lang='ts' theme='tokyo-night' /> */}
+      {/* <Code code={codeNoComments} lang='ts' theme='houston' /> */}
+      <Code code={codeNoComments} lang='ts' theme='material-theme-ocean' />
+      {/* <Code code={codeNoComments} lang='ts' theme='github-dark-default' /> */}
     </div>
   ) : (
     <ErrorBanner message={`Snippet file not found: ${file}`} />
