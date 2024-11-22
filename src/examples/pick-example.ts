@@ -1,6 +1,10 @@
 import { pick } from '@/snippets/object-pick';
+import { createExampleLayoutBuilder } from './core/createExampleLayoutBuilder';
 
 export default function(container: HTMLElement) {
+  const builder = createExampleLayoutBuilder(container);
+  const { logger } = builder;
+
   const user = {
     id: 1,
     name: 'John Doe',
@@ -10,8 +14,9 @@ export default function(container: HTMLElement) {
   };
 
   const publicInfo = pick(user, ['name', 'email']);
+  logger.log('Created user object and picked public info');
 
-  container.innerHTML = `
+  builder.addHtml(`
     <div class="space-y-4">
       <div class="p-4 bg-gray-800 rounded">
         <p class="text-gray-300 mb-2">Original object:</p>
@@ -23,5 +28,5 @@ export default function(container: HTMLElement) {
         <pre class="font-mono text-green-400">${JSON.stringify(publicInfo, null, 2)}</pre>
       </div>
     </div>
-  `;
+  `);
 }

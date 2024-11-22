@@ -1,10 +1,14 @@
 import { chunk } from '@/snippets/array-chunk';
+import { createExampleLayoutBuilder } from './core/createExampleLayoutBuilder';
 
 export default function(container: HTMLElement) {
+  const builder = createExampleLayoutBuilder(container);
+  const { logger } = builder;
+  
   const numbers = Array.from({ length: 10 }, (_, i) => i + 1);
   const result = chunk(numbers, 3);
   
-  container.innerHTML = `
+  builder.addHtml(`
     <div class="space-y-4">
       <div class="p-4 bg-gray-800 rounded">
         <p class="text-gray-300 mb-2">Original array:</p>
@@ -20,16 +24,17 @@ export default function(container: HTMLElement) {
         Try different size
       </button>
     </div>
-  `;
+  `);
 
   let currentSize = 3;
-  const sizeElement = container.querySelector('#size')!;
-  const resultElement = container.querySelector('.text-green-400')!;
+  const sizeElement = builder.container.querySelector('#size')!;
+  const resultElement = builder.container.querySelector('.text-green-400')!;
   
-  container.querySelector('#rechunk')?.addEventListener('click', () => {
+  builder.container.querySelector('#rechunk')?.addEventListener('click', () => {
     currentSize = currentSize === 3 ? 2 : 3;
     const newResult = chunk(numbers, currentSize);
     sizeElement.textContent = String(currentSize);
     resultElement.textContent = newResult.map(chunk => `[${chunk.join(', ')}]`).join(' ');
+    logger.log(`Changed chunk size to ${currentSize}`);
   });
 }

@@ -1,7 +1,11 @@
 import { slugify } from '@/snippets/string-slugify';
+import { createExampleLayoutBuilder } from './core/createExampleLayoutBuilder';
 
 export default function(container: HTMLElement) {
-  container.innerHTML = `
+  const builder = createExampleLayoutBuilder(container);
+  const { logger } = builder;
+  
+  builder.addHtml(`
     <div class="space-y-4">
       <div class="space-y-2">
         <input type="text" id="input" 
@@ -17,13 +21,15 @@ export default function(container: HTMLElement) {
         <p id="result" class="font-mono text-green-400">hello-world-this-is-a-test</p>
       </div>
     </div>
-  `;
+  `);
 
-  const input = container.querySelector('#input')!;
-  const result = container.querySelector('#result')!;
+  const input = builder.container.querySelector('#input')!;
+  const result = builder.container.querySelector('#result')!;
 
   input.addEventListener('input', (e) => {
     const value = (e.target as HTMLInputElement).value;
-    result.textContent = slugify(value);
+    const slugified = slugify(value);
+    result.textContent = slugified;
+    logger.log(`Slugified "${value}" to "${slugified}"`);
   });
 }

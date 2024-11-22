@@ -1,7 +1,11 @@
 import { createUrlParamsProxy } from '@/snippets/url-params-proxy';
+import { createExampleLayoutBuilder } from './core/createExampleLayoutBuilder';
 
 export default function(container: HTMLElement) {
-  container.innerHTML = `
+  const builder = createExampleLayoutBuilder(container);
+  const { logger } = builder;
+  
+  builder.addHtml(`
     <div class="space-y-6">
       <div class="space-y-4">
         <div class="flex gap-4">
@@ -50,7 +54,7 @@ export default function(container: HTMLElement) {
         Note: Changes are reflected in the URL bar and persist across page refreshes
       </div>
     </div>
-  `;
+  `);
 
   // Create URL params proxy with some defaults
   const params = createUrlParamsProxy({
@@ -60,17 +64,18 @@ export default function(container: HTMLElement) {
   });
 
   const updateOutput = () => {
-    const output = container.querySelector('#output')!;
+    const output = builder.container.querySelector('#output')!;
     output.textContent = JSON.stringify(params, null, 2);
+    logger.log('URL parameters updated');
   };
 
   // Initial output
   updateOutput();
 
   // Set parameter
-  container.querySelector('#setParam')?.addEventListener('click', () => {
-    const nameInput = container.querySelector('#paramName') as HTMLInputElement;
-    const valueInput = container.querySelector('#paramValue') as HTMLInputElement;
+  builder.container.querySelector('#setParam')?.addEventListener('click', () => {
+    const nameInput = builder.container.querySelector('#paramName') as HTMLInputElement;
+    const valueInput = builder.container.querySelector('#paramValue') as HTMLInputElement;
     
     const name = nameInput.value.trim();
     let value: any = valueInput.value.trim();
@@ -94,6 +99,7 @@ export default function(container: HTMLElement) {
     else if (value === 'false') value = false;
 
     (params as any)[name] = value;
+    logger.log(`Set parameter ${name} = ${JSON.stringify(value)}`);
     updateOutput();
 
     // Clear inputs
@@ -102,13 +108,14 @@ export default function(container: HTMLElement) {
   });
 
   // Delete parameter
-  container.querySelector('#deleteParam')?.addEventListener('click', () => {
-    const input = container.querySelector('#deleteParamName') as HTMLInputElement;
+  builder.container.querySelector('#deleteParam')?.addEventListener('click', () => {
+    const input = builder.container.querySelector('#deleteParamName') as HTMLInputElement;
     const name = input.value.trim();
 
     if (!name) return;
 
     delete (params as any)[name];
+    logger.log(`Deleted parameter ${name}`);
     updateOutput();
 
     // Clear input

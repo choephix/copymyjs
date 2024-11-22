@@ -1,7 +1,11 @@
 import { EventBus } from '@/snippets/event-bus';
+import { createExampleLayoutBuilder } from './core/createExampleLayoutBuilder';
 
 export default function(container: HTMLElement) {
-  container.innerHTML = `
+  const builder = createExampleLayoutBuilder(container);
+  const { logger } = builder;
+  
+  builder.addHtml(`
     <div class="space-y-6">
       <div class="space-y-4">
         <div class="flex gap-4">
@@ -33,7 +37,7 @@ export default function(container: HTMLElement) {
         <div id="output" class="font-mono text-sm space-y-1"></div>
       </div>
     </div>
-  `;
+  `);
 
   // Create event bus with typed events
   type AppEvents = {
@@ -43,7 +47,7 @@ export default function(container: HTMLElement) {
   };
 
   const bus = new EventBus<AppEvents>();
-  const output = container.querySelector('#output')!;
+  const output = builder.container.querySelector('#output')!;
 
   // Add log entry with timestamp
   const log = (message: string, type = 'info') => {
@@ -54,6 +58,7 @@ export default function(container: HTMLElement) {
     };
     const time = new Date().toLocaleTimeString();
     output.innerHTML = `<div class="${colors[type as keyof typeof colors]}">[${time}] ${message}</div>` + output.innerHTML;
+    logger.log(message);
   };
 
   // Event listeners
@@ -62,8 +67,8 @@ export default function(container: HTMLElement) {
   const onPurchase = (amount: number) => log(`Purchase made: $${amount}`, 'success');
 
   // Toggle event listeners based on checkboxes
-  const logEvents = container.querySelector('#logEvents') as HTMLInputElement;
-  const trackPurchases = container.querySelector('#trackPurchases') as HTMLInputElement;
+  const logEvents = builder.container.querySelector('#logEvents') as HTMLInputElement;
+  const trackPurchases = builder.container.querySelector('#trackPurchases') as HTMLInputElement;
 
   logEvents.addEventListener('change', () => {
     if (logEvents.checked) {
@@ -92,15 +97,15 @@ export default function(container: HTMLElement) {
   });
 
   // Trigger events
-  container.querySelector('#login')?.addEventListener('click', () => {
+  builder.container.querySelector('#login')?.addEventListener('click', () => {
     bus.dispatch('login');
   });
 
-  container.querySelector('#logout')?.addEventListener('click', () => {
+  builder.container.querySelector('#logout')?.addEventListener('click', () => {
     bus.dispatch('logout');
   });
 
-  container.querySelector('#purchase')?.addEventListener('click', () => {
+  builder.container.querySelector('#purchase')?.addEventListener('click', () => {
     const amount = Math.floor(Math.random() * 100) + 1;
     bus.dispatch('purchase', amount);
   });

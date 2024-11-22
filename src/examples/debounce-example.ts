@@ -1,7 +1,11 @@
 import { debounce } from '@/snippets/function-debounce';
+import { createExampleLayoutBuilder } from './core/createExampleLayoutBuilder';
 
 export default function(container: HTMLElement) {
-  container.innerHTML = `
+  const builder = createExampleLayoutBuilder(container);
+  const { logger } = builder;
+  
+  builder.addHtml(`
     <div class="space-y-4">
       <div class="space-y-2">
         <input type="text" id="input" 
@@ -16,17 +20,19 @@ export default function(container: HTMLElement) {
         <p id="result" class="font-mono text-green-400">Start typing...</p>
       </div>
     </div>
-  `;
+  `);
 
-  const input = container.querySelector('#input')!;
-  const result = container.querySelector('#result')!;
+  const input = builder.container.querySelector('#input')!;
+  const result = builder.container.querySelector('#result')!;
 
   const updateResult = debounce((value: string) => {
     result.textContent = value || 'Start typing...';
+    logger.log(`Debounced value: ${value}`);
   }, 500);
 
   input.addEventListener('input', (e) => {
     const value = (e.target as HTMLInputElement).value;
+    logger.log(`Input value: ${value}`);
     updateResult(value);
   });
 }

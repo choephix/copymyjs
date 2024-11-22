@@ -1,7 +1,11 @@
 import { MultipleReasons } from '@/snippets/many-reasons';
+import { createExampleLayoutBuilder } from './core/createExampleLayoutBuilder';
 
 export default function(container: HTMLElement) {
-  container.innerHTML = `
+  const builder = createExampleLayoutBuilder(container);
+  const { logger } = builder;
+  
+  builder.addHtml(`
     <div class="space-y-6">
       <!-- Loading Example -->
       <div class="space-y-4">
@@ -44,12 +48,12 @@ export default function(container: HTMLElement) {
         </div>
       </div>
     </div>
-  `;
+  `);
 
   // Loading Example
   const loadingReasons = new MultipleReasons();
-  const loadingIndicator = container.querySelector('#loadingIndicator')!;
-  const loadingReasonsEl = container.querySelector('#loadingReasons')!;
+  const loadingIndicator = builder.container.querySelector('#loadingIndicator')!;
+  const loadingReasonsEl = builder.container.querySelector('#loadingReasons')!;
 
   loadingReasons.on({
     change: (hasReasons) => {
@@ -57,17 +61,17 @@ export default function(container: HTMLElement) {
       loadingReasonsEl.textContent = hasReasons ? 
         `Current reasons: ${loadingReasons}` : 
         'No active loading operations';
+      logger.log(hasReasons ? `Loading: ${loadingReasons}` : 'Loading complete');
     }
   });
 
-  // Simulate loading operations
-  container.querySelector('#loadData')?.addEventListener('click', async () => {
+  builder.container.querySelector('#loadData')?.addEventListener('click', async () => {
     const cleanup = loadingReasons.add('Loading data...');
     await new Promise(resolve => setTimeout(resolve, 2000));
     cleanup();
   });
 
-  container.querySelector('#loadImages')?.addEventListener('click', async () => {
+  builder.container.querySelector('#loadImages')?.addEventListener('click', async () => {
     const cleanup = loadingReasons.add('Loading images...');
     await new Promise(resolve => setTimeout(resolve, 3000));
     cleanup();
@@ -75,8 +79,8 @@ export default function(container: HTMLElement) {
 
   // Button State Example
   const submitReasons = new MultipleReasons();
-  const submitButton = container.querySelector('#submitButton') as HTMLButtonElement;
-  const submitReasonsEl = container.querySelector('#submitReasons')!;
+  const submitButton = builder.container.querySelector('#submitButton') as HTMLButtonElement;
+  const submitReasonsEl = builder.container.querySelector('#submitReasons')!;
 
   let hasValidationError = false;
   let hasPermissionError = false;
@@ -87,21 +91,23 @@ export default function(container: HTMLElement) {
       submitReasonsEl.textContent = hasReasons ? 
         `Can't submit: ${submitReasons}` : 
         'Ready to submit';
+      logger.log(hasReasons ? `Submit blocked: ${submitReasons}` : 'Submit enabled');
     }
   });
 
-  container.querySelector('#toggleValidation')?.addEventListener('click', () => {
+  builder.container.querySelector('#toggleValidation')?.addEventListener('click', () => {
     hasValidationError = !hasValidationError;
     submitReasons.set('Validation error', hasValidationError);
   });
 
-  container.querySelector('#togglePermission')?.addEventListener('click', () => {
+  builder.container.querySelector('#togglePermission')?.addEventListener('click', () => {
     hasPermissionError = !hasPermissionError;
     submitReasons.set('Permission denied', hasPermissionError);
   });
 
   submitButton.addEventListener('click', () => {
     if (!submitReasons.hasAny()) {
+      logger.log('Form submitted successfully!');
       alert('Form submitted successfully!');
     }
   });
