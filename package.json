@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
+    "dev:all": "astro dev --all",
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
