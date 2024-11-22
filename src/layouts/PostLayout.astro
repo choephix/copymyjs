@@ -1,19 +1,13 @@
 ---
 import Layout from './Layout.astro';
 import Sidebar from '../components/Sidebar.astro';
-import { getCollection } from 'astro:content';
-import { groupPosts } from '../utils/groupPosts';
 
 const { frontmatter, headings } = Astro.props;
-const posts = await getCollection('posts');
-const { groupedPosts, sortedCategories } = groupPosts(posts);
 ---
 
 <Layout title={frontmatter.title}>
   <div class="flex">
     <Sidebar 
-      groupedPosts={groupedPosts}
-      sortedCategories={sortedCategories}
       currentSlug={Astro.params.slug}
       headings={headings}
     />

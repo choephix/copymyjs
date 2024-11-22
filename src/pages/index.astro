@@ -1,9 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getCollection } from 'astro:content';
+import { getPublishedPosts } from '../utils/posts';
 import { groupPosts } from '../utils/groupPosts';
 
-const posts = await getCollection('posts');
+const posts = await getPublishedPosts();
 const { groupedPosts, sortedCategories } = groupPosts(posts);
 
 // const jstsLangStyle = 'font-bold px-1.5 py-0.25 small-caps rounded-md';
