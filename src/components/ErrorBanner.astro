@@ -1,0 +1,50 @@
+---
+interface Props {
+  message: string;
+}
+
+const { message } = Astro.props;
+---
+
+<div class="bg-red-600 text-white rounded-lg shadow-lg p-4 my-4 border-l-4 border-red-800 animate-slideIn">
+  <div class="flex items-center gap-3">
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      class="h-6 w-6 flex-shrink-0" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      stroke-width="2" 
+      stroke-linecap="round" 
+      stroke-linejoin="round"
+    >
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="8" x2="12" y2="12"></line>
+      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+    </svg>
+    <p class="text-base font-medium">{message}</p>
+  </div>
+</div>
+
+<style>
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-slideIn {
+    animation: slideIn 0.3s ease-out;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-slideIn {
+      animation: none;
+    }
+  }
+</style> 

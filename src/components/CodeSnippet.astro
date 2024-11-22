@@ -1,6 +1,7 @@
 ---
 import { Copy } from 'lucide-astro';
 import { Code } from 'astro:components';
+import ErrorBanner from './ErrorBanner.astro';
 
 interface Props {
   file: string;
@@ -16,26 +17,32 @@ const snippetFiles = import.meta.glob<string>('/src/snippets/**/*.ts', {
 const filePath = `/src/snippets/${file}`;
 
 let code = '';
+let fileExists = false;
 if (filePath in snippetFiles) {
   code = await snippetFiles[filePath]();
-} else {
-  code = 'File not found';
+  fileExists = true;
 }
 ---
 
-<div class='snippet-container relative group'>
-  <button
-    class='copy-button absolute top-3 right-3 p-2 rounded-lg bg-gray-800/50 hover:bg-gray-700/50 opacity-0 group-hover:opacity-100 transition-opacity'
-    aria-label='Copy code'
-    data-code={code}
-  >
-    <Copy class='w-5 h-5 text-gray-400' />
-  </button>
-  <!-- <Code code={code} lang='ts' theme='tokyo-night' />
-  <Code code={code} lang='ts' theme='houston' /> -->
-  <Code code={code} lang='ts' theme='material-theme-ocean' />
-  <!-- <Code code={code} lang='ts' theme='github-dark-default' /> -->
-</div>
+{
+  fileExists ? (
+    <div class='snippet-container relative group'>
+      <button
+        class='copy-button absolute top-3 right-3 p-2 rounded-lg bg-gray-800/50 hover:bg-gray-700/50 opacity-0 group-hover:opacity-100 transition-opacity'
+        aria-label='Copy code'
+        data-code={code}
+      >
+        <Copy class='w-5 h-5 text-gray-400' />
+      </button>
+      {/* <Code code={code} lang='ts' theme='tokyo-night' /> */}
+      {/* <Code code={code} lang='ts' theme='houston' /> */}
+      <Code code={code} lang='ts' theme='material-theme-ocean' />
+      {/* <Code code={code} lang='ts' theme='github-dark-default' /> */}
+    </div>
+  ) : (
+    <ErrorBanner message={`Snippet file not found: ${file}`} />
+  )
+}
 
 <style>
   .snippet-container {
