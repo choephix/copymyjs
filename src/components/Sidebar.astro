@@ -18,12 +18,12 @@ function getPostStatus(post: CollectionEntry<'posts'>) {
   if (!showAllPosts) return '';
 
   if (post.data.draft) {
-    return ' (Draft)';
+    return ' Draft';
   }
 
   const publishDate = new Date(post.data.publishDate);
   if (publishDate > new Date()) {
-    return ' (Scheduled)';
+    return ' Scheduled';
   }
 
   return '';
@@ -54,7 +54,7 @@ function getPostStatus(post: CollectionEntry<'posts'>) {
                       ]}
                     >
                       {post.data.title}
-                      <span class='text-gray-500'>{getPostStatus(post)}</span>
+                      <span class='text-gray-500 all-small-caps'>{getPostStatus(post)}</span>
                     </a>
 
                     {post.slug === currentSlug && headings.length > 0 && (
