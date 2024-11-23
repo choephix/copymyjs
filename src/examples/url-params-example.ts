@@ -73,82 +73,30 @@ export default function (container: HTMLElement) {
   const updateOutput = () => {
     const output = builder.container.querySelector('#output')!;
     const defaults = builder.container.querySelector('#defaults')!;
-    output.innerHTML = ''; // Clear existing content
-    defaults.innerHTML = ''; // Clear existing defaults
+    output.innerHTML = '';
+    defaults.innerHTML = '';
     
     const urlParams = new URLSearchParams(window.location.search);
-    
-    // First show parameters that are in our defaults (whether overridden or not)
-    Object.entries(defaultParams).forEach(([key, defaultValue]) => {
-      const row = document.createElement('div');
-      const currentValue = (params as any)[key];
-      const isFromUrl = urlParams.has(key);
-      
-      row.className = isFromUrl 
-        ? 'flex items-center gap-2 text-yellow-400'
-        : 'flex items-center gap-2 text-blue-400';
-      
-      const keySpan = document.createElement('span');
-      keySpan.className = 'min-w-[100px]';
-      keySpan.textContent = key;
-      
-      const separator = document.createElement('span');
-      separator.textContent = ':';
-      
-      const valueSpan = document.createElement('span');
-      valueSpan.textContent = JSON.stringify(currentValue);
-      
-      const typeAndSource = document.createElement('span');
-      typeAndSource.className = 'ml-2 text-gray-500';
-      typeAndSource.textContent = `// ${typeof currentValue}${
-        currentValue && typeof currentValue === 'object' ? ` (${Array.isArray(currentValue) ? 'array' : 'object'})` : ''
-      }, ${isFromUrl ? 'from URL' : 'from defaults'}`;
-      
-      row.appendChild(keySpan);
-      row.appendChild(separator);
-      row.appendChild(valueSpan);
-      row.appendChild(typeAndSource);
-      output.appendChild(row);
-    });
-    
-    // Then show URL parameters that aren't in defaults
-    Array.from(urlParams.entries()).forEach(([key, value]) => {
-      if (!(key in defaultParams)) {
-        const row = document.createElement('div');
-        row.className = 'flex items-center gap-2 text-gray-500';
-        
-        const keySpan = document.createElement('span');
-        keySpan.className = 'min-w-[100px]';
-        keySpan.textContent = key;
-        
-        const separator = document.createElement('span');
-        separator.textContent = ':';
-        
-        const valueSpan = document.createElement('span');
-        let parsedValue = value;
-        try {
-          parsedValue = JSON.parse(value);
-        } catch {
-          // Keep as string if parsing fails
-        }
-        valueSpan.textContent = JSON.stringify(parsedValue);
-        
-        const typeInfo = document.createElement('span');
-        typeInfo.className = 'ml-2 text-gray-600';
-        typeInfo.textContent = `// ${typeof parsedValue}`;
-        
-        row.appendChild(keySpan);
-        row.appendChild(separator);
-        row.appendChild(valueSpan);
-        row.appendChild(typeInfo);
-        output.appendChild(row);
-      }
-    });
 
-    // Show default values
-    Object.entries(defaultParams).forEach(([key, value]) => {
+    const fillInputs = (name: string, value: any) => {
+      const nameInput = builder.container.querySelector('#paramName') as HTMLInputElement;
+      const valueInput = builder.container.querySelector('#paramValue') as HTMLInputElement;
+      const deleteInput = builder.container.querySelector('#deleteParamName') as HTMLInputElement;
+      
+      nameInput.value = name;
+      valueInput.value = typeof value === 'string' ? value : JSON.stringify(value);
+      deleteInput.value = name;
+    };
+
+    const createRow = (
+      key: string, 
+      value: any, 
+      extraInfo: string, 
+      baseColor: string
+    ) => {
       const row = document.createElement('div');
-      row.className = 'flex items-center gap-2 text-blue-400';
+      row.className = `flex items-center gap-2 ${baseColor} cursor-pointer hover:bg-gray-700/50 p-1 rounded`;
+      row.addEventListener('click', () => fillInputs(key, value));
       
       const keySpan = document.createElement('span');
       keySpan.className = 'min-w-[100px]';
@@ -160,16 +108,59 @@ export default function (container: HTMLElement) {
       const valueSpan = document.createElement('span');
       valueSpan.textContent = JSON.stringify(value);
       
-      const typeInfo = document.createElement('span');
-      typeInfo.className = 'ml-2 text-gray-500';
-      typeInfo.textContent = `// ${typeof value}${
-        value && typeof value === 'object' ? ` (${Array.isArray(value) ? 'array' : 'object'})` : ''
+      const infoSpan = document.createElement('span');
+      infoSpan.className = 'ml-2 text-gray-500';
+      infoSpan.textContent = extraInfo;
+      
+      row.append(keySpan, separator, valueSpan, infoSpan);
+      return row;
+    };
+    
+    // Show parameters that are in defaults
+    Object.entries(defaultParams).forEach(([key, defaultValue]) => {
+      const currentValue = (params as any)[key];
+      const isFromUrl = urlParams.has(key);
+      
+      const typeInfo = `// ${typeof currentValue}${
+        currentValue && typeof currentValue === 'object' 
+          ? ` (${Array.isArray(currentValue) ? 'array' : 'object'})` 
+          : ''
+      }, ${isFromUrl ? 'from URL' : 'from defaults'}`;
+      
+      const row = createRow(
+        key, 
+        currentValue, 
+        typeInfo,
+        isFromUrl ? 'text-yellow-400' : 'text-blue-400'
+      );
+      output.appendChild(row);
+    });
+    
+    // Show URL parameters that aren't in defaults
+    Array.from(urlParams.entries()).forEach(([key, value]) => {
+      if (!(key in defaultParams)) {
+        let parsedValue = value;
+        try {
+          parsedValue = JSON.parse(value);
+        } catch {
+          // Keep as string if parsing fails
+        }
+
+        const typeInfo = `// ${typeof parsedValue}`;
+        const row = createRow(key, parsedValue, typeInfo, 'text-gray-500');
+        output.appendChild(row);
+      }
+    });
+
+    // Show default values
+    Object.entries(defaultParams).forEach(([key, value]) => {
+      const typeInfo = `// ${typeof value}${
+        value && typeof value === 'object' 
+          ? ` (${Array.isArray(value) ? 'array' : 'object'})` 
+          : ''
       }`;
       
-      row.appendChild(keySpan);
-      row.appendChild(separator);
-      row.appendChild(valueSpan);
-      row.appendChild(typeInfo);
+      const row = createRow(key, value, typeInfo, 'text-blue-400');
       defaults.appendChild(row);
     });
     
