@@ -25,7 +25,7 @@ export default function (container: HTMLElement) {
             id="setParam"
             class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
           >
-            Set Parameter
+            Set
           </button>
         </div>
         
@@ -40,14 +40,19 @@ export default function (container: HTMLElement) {
             id="deleteParam"
             class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
           >
-            Delete Parameter
+            Delete
           </button>
         </div>
       </div>
 
       <div class="p-4 bg-gray-800 rounded">
         <p class="text-gray-300 mb-2">Current URL Parameters:</p>
-        <pre id="output" class="font-mono text-sm text-green-400"></pre>
+        <div id="output" class="font-mono text-sm space-y-1"></div>
+      </div>
+
+      <div class="p-4 bg-gray-800 rounded">
+        <p class="text-gray-300 mb-2">Default Values:</p>
+        <div id="defaults" class="font-mono text-sm space-y-1"></div>
       </div>
 
       <div class="p-4 bg-gray-800/50 rounded text-sm text-gray-400">
@@ -57,15 +62,117 @@ export default function (container: HTMLElement) {
   `);
 
   // Create URL params proxy with some defaults
-  const params = createUrlParamsProxy({
+  const defaultParams = {
     theme: 'light',
     page: 1,
     filters: { active: true },
-  });
+  };
+  
+  const params = createUrlParamsProxy(defaultParams);
 
   const updateOutput = () => {
     const output = builder.container.querySelector('#output')!;
-    output.textContent = JSON.stringify(params, null, 2);
+    const defaults = builder.container.querySelector('#defaults')!;
+    output.innerHTML = ''; // Clear existing content
+    defaults.innerHTML = ''; // Clear existing defaults
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // First show parameters that are in our defaults (whether overridden or not)
+    Object.entries(defaultParams).forEach(([key, defaultValue]) => {
+      const row = document.createElement('div');
+      const currentValue = (params as any)[key];
+      const isFromUrl = urlParams.has(key);
+      
+      row.className = isFromUrl 
+        ? 'flex items-center gap-2 text-yellow-400'
+        : 'flex items-center gap-2 text-blue-400';
+      
+      const keySpan = document.createElement('span');
+      keySpan.className = 'min-w-[100px]';
+      keySpan.textContent = key;
+      
+      const separator = document.createElement('span');
+      separator.textContent = ':';
+      
+      const valueSpan = document.createElement('span');
+      valueSpan.textContent = JSON.stringify(currentValue);
+      
+      const typeAndSource = document.createElement('span');
+      typeAndSource.className = 'ml-2 text-gray-500';
+      typeAndSource.textContent = `// ${typeof currentValue}${
+        currentValue && typeof currentValue === 'object' ? ` (${Array.isArray(currentValue) ? 'array' : 'object'})` : ''
+      }, ${isFromUrl ? 'from URL' : 'from defaults'}`;
+      
+      row.appendChild(keySpan);
+      row.appendChild(separator);
+      row.appendChild(valueSpan);
+      row.appendChild(typeAndSource);
+      output.appendChild(row);
+    });
+    
+    // Then show URL parameters that aren't in defaults
+    Array.from(urlParams.entries()).forEach(([key, value]) => {
+      if (!(key in defaultParams)) {
+        const row = document.createElement('div');
+        row.className = 'flex items-center gap-2 text-gray-500';
+        
+        const keySpan = document.createElement('span');
+        keySpan.className = 'min-w-[100px]';
+        keySpan.textContent = key;
+        
+        const separator = document.createElement('span');
+        separator.textContent = ':';
+        
+        const valueSpan = document.createElement('span');
+        let parsedValue = value;
+        try {
+          parsedValue = JSON.parse(value);
+        } catch {
+          // Keep as string if parsing fails
+        }
+        valueSpan.textContent = JSON.stringify(parsedValue);
+        
+        const typeInfo = document.createElement('span');
+        typeInfo.className = 'ml-2 text-gray-600';
+        typeInfo.textContent = `// ${typeof parsedValue}`;
+        
+        row.appendChild(keySpan);
+        row.appendChild(separator);
+        row.appendChild(valueSpan);
+        row.appendChild(typeInfo);
+        output.appendChild(row);
+      }
+    });
+
+    // Show default values
+    Object.entries(defaultParams).forEach(([key, value]) => {
+      const row = document.createElement('div');
+      row.className = 'flex items-center gap-2 text-blue-400';
+      
+      const keySpan = document.createElement('span');
+      keySpan.className = 'min-w-[100px]';
+      keySpan.textContent = key;
+      
+      const separator = document.createElement('span');
+      separator.textContent = ':';
+      
+      const valueSpan = document.createElement('span');
+      valueSpan.textContent = JSON.stringify(value);
+      
+      const typeInfo = document.createElement('span');
+      typeInfo.className = 'ml-2 text-gray-500';
+      typeInfo.textContent = `// ${typeof value}${
+        value && typeof value === 'object' ? ` (${Array.isArray(value) ? 'array' : 'object'})` : ''
+      }`;
+      
+      row.appendChild(keySpan);
+      row.appendChild(separator);
+      row.appendChild(valueSpan);
+      row.appendChild(typeInfo);
+      defaults.appendChild(row);
+    });
+    
     logger.log('URL parameters updated');
   };
 
