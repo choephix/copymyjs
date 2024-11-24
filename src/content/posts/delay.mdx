@@ -1,0 +1,55 @@
+---
+title: 'Delay Promise'
+publishDate: '2024-03-20'
+description: 'A simple utility to create delays in async operations'
+draft: true
+category: 'helpers'
+version: 0
+---
+
+import CodeSnippet from '@/components/CodeSnippet.astro';
+import Example from '@/components/Example.astro';
+
+# Delay Function for Async Operations
+
+A simple yet powerful utility for adding controlled delays in your async operations.
+
+## Basic Usage
+
+The delay function creates a promise-based delay, perfect for testing and throttling:
+
+<CodeSnippet file="async-delay.ts" />
+
+### Live Example
+
+Click the button to see a countdown using the delay function:
+
+<Example component="delay-example" />
+
+## Advanced Patterns
+
+### Retry with Delay
+
+Here's how you can use delayMs for implementing retry logic:
+
+```typescript
+async function fetchWithRetry(url: string, maxRetries = 3) {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await fetch(url);
+    } catch (error) {
+      if (i === maxRetries - 1) throw error;
+      await delayMs(1000 * Math.pow(2, i)); // Exponential backoff
+    }
+  }
+}
+```
+
+## Best Practices
+
+When using delays in production:
+
+- Avoid unnecessary delays in critical paths
+- Use exponential backoff for retries
+- Consider user experience when adding delays
+- Add timeout limits to prevent infinite waits

@@ -1,0 +1,213 @@
+---
+title: 'Storage Proxies'
+publishDate: '2024-03-21'
+description: 'Type-safe proxies for working with browser storage'
+draft: true
+category: 'helpers'
+version: 1
+---
+
+import CodeSnippet from '@/components/CodeSnippet.astro';
+import Example from '@/components/Example.astro';
+
+# Storage Proxies
+
+Two different approaches to creating type-safe proxies for browser storage, allowing you to work with localStorage as if it were a regular object while maintaining persistence.
+
+## Prefixed Storage
+
+Store individual values in localStorage with prefixed keys:
+
+<CodeSnippet file="storage/prefixed-storage.ts" />
+
+### Live Example
+
+Try out the prefixed storage proxy:
+
+<Example component="storage-examples" namedExport="example1" />
+
+## JSON Storage
+
+Store all values as a single JSON object in localStorage:
+
+<CodeSnippet file="storage/json-storage.ts" />
+
+### Live Example
+
+Try out the JSON storage proxy:
+
+<Example component="storage-examples" namedExport="example2" />
+
+## Usage Examples
+
+### Prefixed Storage
+
+```typescript
+// Create storage with defaults and prefix
+const settings = createPrefixedStorageProxy('app:', {
+  theme: 'light',
+  fontSize: 16,
+  notifications: true
+});
+
+// Use like a regular object
+settings.theme = 'dark';
+console.log(settings.theme); // 'dark'
+delete settings.fontSize;
+
+// Values persist in localStorage with prefix
+// localStorage.getItem('app:theme') === '"dark"'
+```
+
+### JSON Storage
+
+```typescript
+// Create storage with defaults
+const gameState = createJsonStorageProxy('game', {
+  level: 1,
+  score: 0,
+  inventory: []
+});
+
+// Use like a regular object
+gameState.level = 2;
+gameState.inventory = ['sword', 'shield'];
+
+// All values stored as single JSON object
+// localStorage.getItem('game') === '{"level":2,"inventory":["sword","shield"]}'
+```
+
+## Key Features
+
+### Prefixed Storage
+- Individual key-value storage
+- Automatic key prefixing
+- Type-safe property access
+- Default values
+- JSON serialization
+
+### JSON Storage
+- Single storage entry
+- Atomic updates
+- Reduced storage overhead
+- Type-safe property access
+- Default values
+
+## Best Practices
+
+1. **Type Safety**
+   ```typescript
+   interface Settings {
+     theme: 'light' | 'dark';
+     fontSize: number;
+     notifications: boolean;
+   }
+
+   const settings = createPrefixedStorageProxy<Settings>('app:', {
+     theme: 'light',
+     fontSize: 16,
+     notifications: true
+   });
+   ```
+
+2. **Error Handling**
+   ```typescript
+   try {
+     settings.largeObject = complexData;
+   } catch (error) {
+     // Handle storage quota exceeded
+     console.error('Storage failed:', error);
+   }
+   ```
+
+3. **Cleanup**
+   ```typescript
+   function resetSettings() {
+     delete settings.theme;
+     delete settings.fontSize;
+     // Or use Object.keys to delete all
+     Object.keys(settings).forEach(key => {
+       delete settings[key];
+     });
+   }
+   ```
+
+## Common Use Cases
+
+1. **User Preferences**
+   - Theme settings
+   - UI customization
+   - Feature flags
+
+2. **Application State**
+   - Form data
+   - Wizard progress
+   - Shopping cart
+
+3. **Game State**
+   - Save games
+   - Player progress
+   - Achievements
+
+4. **Caching**
+   - API responses
+   - Resource URLs
+   - Computed results
+
+## Advanced Patterns
+
+### Session Storage Variant
+
+```typescript
+const tempStorage = createPrefixedStorageProxy('temp:', {}, sessionStorage);
+```
+
+### Custom Storage Implementation
+
+```typescript
+const memoryStorage = {
+  data: new Map<string, string>(),
+  getItem: (key: string) => this.data.get(key) ?? null,
+  setItem: (key: string, value: string) => this.data.set(key, value)
+};
+
+const storage = createJsonStorageProxy('test', {}, memoryStorage);
+```
+
+### Storage with Events
+
+```typescript
+function createStorageWithEvents<T>() {
+  const events = new EventTarget();
+  const storage = createJsonStorageProxy<T>('store', {});
+
+  return new Proxy(storage, {
+    set(target, prop, value) {
+      const result = Reflect.set(target, prop, value);
+      events.dispatchEvent(
+        new CustomEvent('change', { 
+          detail: { key: prop, value } 
+        })
+      );
+      return result;
+    }
+  });
+}
+```
+
+### Versioned Storage
+
+```typescript
+function createVersionedStorage<T>(version: number) {
+  const storage = createJsonStorageProxy<T & { _version?: number }>('store', {
+    _version: version
+  });
+
+  if (storage._version !== version) {
+    // Handle migration
+    storage._version = version;
+  }
+
+  return storage;
+}
+``` 

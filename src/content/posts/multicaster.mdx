@@ -1,0 +1,100 @@
+---
+title: 'Multicaster'
+publishDate: '2024-03-21'
+description: 'Create flexible event handling systems with priority and ordering capabilities'
+draft: true
+category: 'helpers'
+version: 1
+---
+
+import CodeSnippet from '@/components/CodeSnippet.astro';
+import Example from '@/components/Example.astro';
+
+# Multicaster: Event Handling with Priority and Order
+
+A multicaster is a flexible event handling system that allows multiple subscribers to listen for and react to events. Here are three variations with different capabilities.
+
+## Priority-based Multicaster
+
+This version allows subscribers to specify a priority level, ensuring that higher-priority handlers are called first:
+
+<CodeSnippet file="multicaster.ts" />
+
+## Simple Multicaster
+
+A lightweight version without priority handling, perfect for basic pub/sub scenarios:
+
+<CodeSnippet file="simple-multicaster.ts" />
+
+## Ordered Multicaster
+
+This variation provides explicit ordering through `before`, `normal`, and `after` subscriptions:
+
+<CodeSnippet file="ordered-multicaster.ts" />
+
+## Live Example
+
+Try out all three multicaster variations:
+
+<Example component="multicaster-example" />
+
+## Usage Examples
+
+### Priority-based Multicaster
+
+```typescript
+const onMessage = createMulticaster();
+
+// High priority handler (1)
+onMessage.sub(msg => {
+  console.log('High priority:', msg);
+}, 1);
+
+// Normal priority handler (0)
+onMessage.sub(msg => {
+  console.log('Normal priority:', msg);
+});
+
+// Emit an event
+onMessage('Hello!');
+```
+
+### Ordered Multicaster
+
+```typescript
+const onInit = createOrderedMulticaster();
+
+// Will run first
+onInit.subBefore(() => {
+  console.log('Loading configuration...');
+});
+
+// Will run second
+onInit.sub(() => {
+  console.log('Initializing app...');
+});
+
+// Will run last
+onInit.subAfter(() => {
+  console.log('Setup complete!');
+});
+
+onInit();
+```
+
+## Common Use Cases
+
+1. **Plugin Systems**: Use priority-based multicasters to create plugin systems where certain plugins need to run before others.
+
+2. **Middleware**: Create middleware chains with the ordered multicaster, similar to Express.js middleware.
+
+3. **Event Buses**: Use simple multicasters for basic event handling across your application.
+
+4. **Lifecycle Hooks**: Implement framework lifecycle hooks with ordered multicasters to ensure proper initialization and cleanup order.
+
+## Best Practices
+
+- Use the simplest version that meets your needs
+- Clear subscribers when they're no longer needed
+- Consider using TypeScript generics for better type safety
+- Store unsubscribe functions to prevent memory leaks

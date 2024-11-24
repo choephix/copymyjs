@@ -1,0 +1,46 @@
+---
+title: 'Useful Array Utilities in TypeScript'
+publishDate: '2024-03-20'
+description: 'A collection of helpful array utility functions in TypeScript'
+draft: true
+category: 'classic'
+version: 0
+---
+
+import CodeSnippet from '@/components/CodeSnippet.astro';
+import Example from '@/components/Example.astro';
+
+# Array Utilities in TypeScript
+
+A collection of useful array utility functions I've created in TypeScript.
+
+## Chunk Array
+
+Sometimes you need to split an array into smaller chunks of a specific size. Here's a utility function that does exactly that:
+
+<CodeSnippet file="array-chunk.ts" />
+
+### Live Example
+
+Here's how you can use the chunk function:
+
+<Example component="chunk-example" />
+
+Try clicking the button to see how different chunk sizes affect the result!
+
+## Performance Considerations
+
+When working with large arrays, the chunk function is quite efficient as it:
+
+- Creates only one new array for all chunks
+- Uses Array.from for optimal memory allocation
+- Avoids unnecessary array copying
+
+## Common Use Cases
+
+The chunk function is particularly useful for:
+
+- Batch processing large datasets
+- Creating paginated views
+- Managing API request batches
+- Organizing data for grid layouts

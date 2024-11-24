@@ -1,0 +1,56 @@
+---
+title: 'Pick Object Properties'
+publishDate: '2024-03-20'
+description: 'A TypeScript utility to pick specific properties from objects'
+draft: true
+category: 'classic'
+version: 0
+---
+
+import CodeSnippet from '@/components/CodeSnippet.astro';
+import Example from '@/components/Example.astro';
+
+# Pick Object Properties
+
+A type-safe utility for creating new objects with only the properties you need.
+
+## Basic Usage
+
+The pick function lets you safely extract specific properties from objects:
+
+<CodeSnippet file="object-pick.ts" />
+
+### Live Example
+
+See how the pick function works with a user object:
+
+<Example component="pick-example" />
+
+## Type Safety
+
+Our pick function maintains full type safety:
+
+- Prevents picking non-existent properties
+- Preserves property types
+- Works with optional properties
+
+## Common Applications
+
+### API Response Filtering
+
+```typescript
+const fullResponse = await api.getUser(id);
+const publicData = pick(fullResponse, ['id', 'name', 'avatar']);
+```
+
+### Form Data Processing
+
+```typescript
+const formData = pick(event.target, ['username', 'email']);
+```
+
+## Performance Tips
+
+- Use pick for shallow copying only
+- Consider object destructuring for simple cases
+- Cache results when picking from large objects
