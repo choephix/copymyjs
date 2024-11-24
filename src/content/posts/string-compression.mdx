@@ -1,0 +1,245 @@
+---
+title: 'String Compression with Streams'
+publishDate: '2024-03-21'
+description: 'Compress and decompress strings efficiently using Web Streams API'
+draft: true
+category: 'helpers'
+version: 1
+---
+
+import CodeSnippet from '@/components/CodeSnippet.astro';
+import Example from '@/components/Example.astro';
+
+# String Compression with Streams
+
+A modern approach to string compression in the browser using the Web Streams API. This implementation provides efficient compression and decompression of strings using the DEFLATE algorithm.
+
+## Implementation
+
+<CodeSnippet file="string-compression.ts" />
+
+## Live Example
+
+Try compressing and decompressing your own text:
+
+<Example component="string-compression-example" />
+
+## Key Features
+
+- **Stream-based**: Uses modern Web Streams API for efficient processing
+- **Base64 Output**: Compressed data is returned as base64 for easy storage/transport
+- **DEFLATE Algorithm**: Industry-standard compression algorithm
+- **Async/Promise-based**: Non-blocking operations
+- **Browser Native**: No external dependencies required
+
+## Usage Examples
+
+### Basic Compression
+
+```typescript
+const originalText = "Hello, this is some text that will be compressed!";
+const compressed = await compressWithStreams(originalText);
+console.log('Compressed:', compressed);
+// Output: "eJwLSS0uUUhUKE4tLlEoLknMzVRIzEtRKEpNzAEAe9QJZQ=="
+```
+
+### Compression and Decompression
+
+```typescript
+// Compress
+const original = "Some long text that needs compression...";
+const compressed = await compressWithStreams(original);
+
+// Decompress
+const decompressed = await decompressWithStreams(compressed);
+console.log(decompressed === original); // true
+```
+
+### Working with JSON
+
+```typescript
+const data = {
+  users: [
+    { id: 1, name: "John" },
+    { id: 2, name: "Jane" }
+  ],
+  metadata: {
+    version: "1.0",
+    timestamp: Date.now()
+  }
+};
+
+// Compress JSON
+const compressed = await compressWithStreams(JSON.stringify(data));
+
+// Store compressed data
+localStorage.setItem('compressedData', compressed);
+
+// Later, decompress and parse
+const retrieved = localStorage.getItem('compressedData');
+const decompressed = await decompressWithStreams(retrieved);
+const parsedData = JSON.parse(decompressed);
+```
+
+## Best Practices
+
+1. **Error Handling**
+   ```typescript
+   try {
+     const compressed = await compressWithStreams(largeString);
+   } catch (error) {
+     console.error('Compression failed:', error);
+     // Handle compression failure
+   }
+   ```
+
+2. **Size Considerations**
+   ```typescript
+   function shouldCompress(str: string) {
+     // Only compress strings over 1KB
+     return str.length > 1024;
+   }
+   
+   async function saveData(str: string) {
+     const data = shouldCompress(str) 
+       ? await compressWithStreams(str)
+       : str;
+     localStorage.setItem('data', data);
+   }
+   ```
+
+3. **Progress Monitoring**
+   ```typescript
+   async function compressWithProgress(str: string, onProgress: (percent: number) => void) {
+     const blob = new Blob([str]);
+     const total = blob.size;
+     let processed = 0;
+     
+     const compressed = await new Response(
+       new ReadableStream({
+         start(controller) {
+           const reader = blob.stream()
+             .pipeThrough(new CompressionStream('deflate'))
+             .getReader();
+           
+           function push() {
+             reader.read().then(({done, value}) => {
+               if (done) {
+                 controller.close();
+                 return;
+               }
+               processed += value.length;
+               onProgress((processed / total) * 100);
+               controller.enqueue(value);
+               push();
+             });
+           }
+           push();
+         }
+       })
+     ).blob();
+     
+     return compressed;
+   }
+   ```
+
+## Common Use Cases
+
+1. **Data Storage**
+   - Reducing localStorage usage
+   - Optimizing IndexedDB storage
+   - Efficient cache storage
+
+2. **Data Transfer**
+   - API payload compression
+   - WebSocket message optimization
+   - File uploads/downloads
+
+3. **State Management**
+   - URL state compression
+   - History state compression
+   - Session storage optimization
+
+4. **Content Handling**
+   - Text content compression
+   - JSON data compression
+   - Configuration storage
+
+## Advanced Patterns
+
+### Custom Compression Stream
+
+```typescript
+class CustomCompressionStream extends TransformStream {
+  constructor() {
+    super({
+      transform(chunk, controller) {
+        // Custom compression logic
+        controller.enqueue(compressedChunk);
+      }
+    });
+  }
+}
+
+async function compressWithCustomStream(str: string) {
+  return new Response(
+    new Blob([str])
+      .stream()
+      .pipeThrough(new CustomCompressionStream())
+  ).blob();
+}
+```
+
+### Compression with Encryption
+
+```typescript
+async function compressAndEncrypt(str: string, key: CryptoKey) {
+  // First compress
+  const compressed = await compressWithStreams(str);
+  
+  // Then encrypt
+  const encrypted = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv: window.crypto.getRandomValues(new Uint8Array(12)) },
+    key,
+    new TextEncoder().encode(compressed)
+  );
+  
+  return encrypted;
+}
+```
+
+### Streaming Response Handler
+
+```typescript
+async function handleCompressedResponse(response: Response) {
+  const reader = response.body!
+    .pipeThrough(new DecompressionStream('deflate'))
+    .getReader();
+    
+  let result = '';
+  while (true) {
+    const {done, value} = await reader.read();
+    if (done) break;
+    result += new TextDecoder().decode(value);
+  }
+  
+  return result;
+}
+```
+
+### Worker-based Compression
+
+```typescript
+// In worker.ts
+self.onmessage = async (e) => {
+  const compressed = await compressWithStreams(e.data);
+  self.postMessage(compressed);
+};
+
+// In main thread
+const worker = new Worker('worker.ts');
+worker.onmessage = (e) => {
+  console.log('Compressed in worker:', e.data);
+};
+worker.postMessage(largeString);
+``` 
