@@ -127,12 +127,13 @@ export default function (container: HTMLElement) {
       </div>
 
       <div class="p-4 bg-gray-800/50 rounded">
-        <p class="text-gray-300 mb-2 text-sm">Stats:</p>
         <div id="stats" class="font-mono text-xs space-y-1"></div>
       </div>
 
+      <hr/>
+
       <div class="p-4 bg-gray-800/50 rounded">
-        <p class="text-gray-300 mb-2 text-sm">Try Example Texts:</p>
+        <p class="text-gray-300 mb-2 text-xs my-0 font-bold">Try these sample inputs</p> 
         <div class="flex flex-wrap gap-2" id="examples">
           ${Object.keys(EXAMPLE_TEXTS).map(name => `
             <button class="px-3 py-1.5 bg-gray-700/50 text-xs text-white rounded-full hover:bg-gray-600 transition-colors example-text" data-name="${name}">
@@ -201,7 +202,6 @@ export default function (container: HTMLElement) {
       compressBtn.disabled = true;
       compressBtn.innerHTML = `Compressing... ${String.fromCodePoint(0x2193)}`;
 
-      
       const compressed = await compressWithStreams(text);
       compressedOutput.value = compressed;
       lastInputValue = text;
