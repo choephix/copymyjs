@@ -1,4 +1,4 @@
-import { createCustomAwaitable } from '@/snippets/custom-awaitable';
+import { createCustomAwaitable } from '@/snippets/thenable/custom-awaitable';
 import { createExampleLayoutBuilder } from './core/createExampleLayoutBuilder';
 
 export default function (container: HTMLElement) {
