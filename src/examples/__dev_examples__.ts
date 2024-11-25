@@ -107,3 +107,50 @@ export function example3(container: HTMLElement) {
 
   btn.addEventListener('click', bounce);
 }
+
+export function example0(container: HTMLElement) {
+  const builder = createExampleLayoutBuilder(container);
+  const { logger } = builder;
+
+  builder.addHtml(`
+    <div class="flex flex-col gap-4">
+      <div class="flex gap-4 flex-wrap">
+        <button id="logBtn" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+          Log Random Message
+        </button>
+        <button id="addItemBtn" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors">
+          Add List Item
+        </button>
+      </div>
+      <ul id="itemList" class="list-disc pl-6 space-y-2">
+        <li>Initial list item</li>
+      </ul>
+    </div>
+  `);
+
+  const logBtn = builder.container.querySelector('#logBtn')!;
+  const addItemBtn = builder.container.querySelector('#addItemBtn')!;
+  const itemList = builder.container.querySelector('#itemList')!;
+  let itemCount = 1;
+
+  const randomMessages = [
+    "Hey, I'm a log message!",
+    "Look at me, I'm testing the logger!",
+    "The log bar should handle this just fine",
+    "Responsiveness test in progress...",
+    "How's that layout looking?",
+  ];
+
+  logBtn.addEventListener('click', () => {
+    const randomIndex = Math.floor(Math.random() * randomMessages.length);
+    logger.log(randomMessages[randomIndex]);
+  });
+
+  addItemBtn.addEventListener('click', () => {
+    itemCount++;
+    const li = document.createElement('li');
+    li.textContent = `Dynamically added item ${itemCount}`;
+    itemList.appendChild(li);
+    logger.log(`Added item ${itemCount}`);
+  });
+}
