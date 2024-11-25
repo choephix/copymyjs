@@ -15,7 +15,7 @@ export function createExampleLayoutBuilder(
 ): ExampleLayoutBuilder {
   // Main wrapper with relative positioning
   const wrapper = document.createElement('div');
-  wrapper.className = 'relative w-full h-full rounded-lg shadow-lg overflow-hidden';
+  wrapper.className = 'relative w-full h-full';
   parentElement.appendChild(wrapper);
 
   // Main container that fills available space

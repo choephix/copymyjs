@@ -9,7 +9,7 @@ const { component, namedExport } = Astro.props;
 
 <div class='example-container mt-6'>
   <div
-    class='example-content border border-gray-700 rounded overflow-hidden bg-[#212f4d]'
+    class='example-content border border-gray-700 rounded overflow-hidden bg-[#212f4d] min-h-[200px]'
     data-example={component}
     data-named-export={namedExport}
   >
@@ -45,7 +45,8 @@ const { component, namedExport } = Astro.props;
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        const container = entry.target.querySelector<HTMLDivElement>('.example-content');
+        const container =
+          entry.target.querySelector<HTMLDivElement>('.example-content');
         const componentName = container?.dataset.example;
         const namedExport = container?.dataset.namedExport;
 
