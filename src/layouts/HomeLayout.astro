@@ -1,0 +1,41 @@
+---
+import Layout from './Layout.astro';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+
+// Move the styles from index.astro
+const jstsLangStyle = 'font-bold px-2.5 py-0.5 small-caps uppercase rounded-md';
+const jsLangStyle = `${jstsLangStyle} bg-[#f7df1e] text-black`;
+const tsLangStyle = `${jstsLangStyle} bg-[#3178c6] text-white`;
+---
+
+<Layout title={title}>
+  <main class='max-w-3xl mx-auto px-4 py-8'>
+    <div class='text-center mb-16'>
+      <img 
+        src='/copymyjs-doodle-xs.png' 
+        alt='CopyMyJS Logo' 
+        class='mx-auto mb-8 mt-16 w-28 h-28' 
+      />
+      <h1 class='text-5xl font-bold mb-16 text-white'>
+        Copy My
+        <span class={jsLangStyle}>js</span> / <span class={tsLangStyle}>ts</span>
+      </h1>
+      <div class='bg-gray-800/50 p-8 rounded-lg border border-gray-700 mb-8'>
+        <p class='text-xl text-gray-300 mb-4'>
+          A collection of battle-tested, type-safe, copy-paste ready snippets for your projects.
+        </p>
+        <p class='text-gray-400'>
+          Each snippet comes with live examples, TypeScript types, and zero dependencies. 
+          Just copy, paste, and code away!
+        </p>
+      </div>
+    </div>
+
+    <slot />
+  </main>
+</Layout> 
