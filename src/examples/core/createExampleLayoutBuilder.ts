@@ -13,14 +13,14 @@ interface ExampleLayoutBuilder {
 export function createExampleLayoutBuilder(
   parentElement: HTMLElement
 ): ExampleLayoutBuilder {
-  // Single wrapper with flex row
+  // Main wrapper with relative positioning
   const wrapper = document.createElement('div');
-  wrapper.className = 'flex flex-row gap-4 overflow-hidden';
+  wrapper.className = 'relative w-full h-full rounded-lg shadow-lg overflow-hidden';
   parentElement.appendChild(wrapper);
 
-  // Main container that grows naturally
+  // Main container that fills available space
   const mainContainer = document.createElement('div');
-  mainContainer.className = 'space-y-4 flex-1 min-h-0 p-6';
+  mainContainer.className = 'p-6 space-y-4';
   wrapper.appendChild(mainContainer);
 
   let logContainer: HTMLElement | null = null;
@@ -36,14 +36,23 @@ export function createExampleLayoutBuilder(
     return (...args: unknown[]) => {
       if (!logContainer) {
         logContainer = document.createElement('div');
-        logContainer.className =
-          'w-64 p-2 bg-[#19233a] font-mono text-xs ' +
-          'shrink-0 overflow-y-auto self-stretch max-h-[200px] ' +
-          'outline outline-1 outline-gray-700 ' +
-          'animate-slide-in scrollbar-slim';
+        logContainer.className = 
+          'absolute top-0 bottom-0 right-0 w-[200px] ' +
+          'font-mono text-xs ' +
+          'transition-transform duration-300 ' +
+          'overflow-hidden rounded-l-lg box-border ' +
+          'animate-slide-in scrollbar-slim p-1';
+
+        const innerContainer = document.createElement('div');
+        innerContainer.className = 
+          'w-full h-full overflow-y-auto overflow-x-hidden ' +
+          'bg-[#19233a] border border-gray-700 ' +
+          'rounded-lg p-2 box-border scrollbar-slim';
+        
+        logContainer.appendChild(innerContainer);
         wrapper.appendChild(logContainer);
 
-        Object.assign(lazyLogger, createLoggerInterface(logContainer));
+        Object.assign(lazyLogger, createLoggerInterface(innerContainer));
       }
 
       const message = args.join(' ');
@@ -65,9 +74,9 @@ function createLoggerInterface(logElement: HTMLElement): Logger {
     const entry = document.createElement('div');
     entry.className =
       {
-        log: 'text-gray-700 dark:text-gray-300',
-        warn: 'text-yellow-600 dark:text-yellow-400',
-        error: 'text-red-600 dark:text-red-400',
+        log: 'text-gray-300 dark:text-gray-300',
+        warn: 'text-yellow-400 dark:text-yellow-400',
+        error: 'text-red-400 dark:text-red-400',
       }[type] + ' leading-tight py-0.5';
     entry.textContent = message;
     logElement.appendChild(entry);
