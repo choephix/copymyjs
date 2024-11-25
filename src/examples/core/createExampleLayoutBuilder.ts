@@ -20,7 +20,7 @@ export function createExampleLayoutBuilder(
 
   // Main container that fills available space
   const mainContainer = document.createElement('div');
-  mainContainer.className = 'p-6 space-y-4';
+  mainContainer.className = 'p-6 space-y-4 mr-[200px]';
   wrapper.appendChild(mainContainer);
 
   let logContainer: HTMLElement | null = null;
