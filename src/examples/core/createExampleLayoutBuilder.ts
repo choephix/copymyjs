@@ -1,7 +1,7 @@
 interface Logger {
-  log: (message: string) => void;
-  warn: (message: string) => void;
-  error: (message: string) => void;
+  log: (...args: any[]) => void;
+  warn: (...args: any[]) => void;
+  error: (...args: any[]) => void;
 }
 
 interface ExampleLayoutBuilder {
@@ -33,7 +33,7 @@ export function createExampleLayoutBuilder(
   };
 
   function createLazyLogMethod(type: 'log' | 'warn' | 'error') {
-    return (message: string) => {
+    return (...args: unknown[]) => {
       if (!logContainer) {
         logContainer = document.createElement('div');
         logContainer.className =
@@ -46,6 +46,7 @@ export function createExampleLayoutBuilder(
         Object.assign(lazyLogger, createLoggerInterface(logContainer));
       }
 
+      const message = args.join(' ');
       lazyLogger[type](message);
     };
   }
