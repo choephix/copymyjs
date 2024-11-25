@@ -1,43 +1,46 @@
 ---
 import Layout from './Layout.astro';
-import Sidebar from '../components/Sidebar.astro';
+import Sidebar from '@/components/Sidebar.astro';
+import Footer from '@/components/Footer.astro';
 
 const { frontmatter, headings } = Astro.props;
 ---
 
 <Layout title={frontmatter.title}>
-  <div class="flex">
-    <Sidebar 
-      currentSlug={Astro.params.slug}
-      headings={headings}
-    />
+  <div class='flex'>
+    <Sidebar currentSlug={Astro.params.slug} headings={headings} />
 
     <!-- Main content -->
-    <main class="flex-1 max-w-3xl mx-auto px-8 py-12">
-      <article class="prose prose-invert">
-        <!-- <h1 class="text-4xl font-bold mb-4">{frontmatter.title}</h1> -->
-        <!-- <p class="text-gray-400 mb-8">Published on {frontmatter.publishDate}</p> -->
-        <slot />
-      </article>
-    </main>
+    <div class='flex-1 mx-auto px-8 py-12'>
+      <main class='flex-1 max-w-4xl mx-auto'>
+        <article class='prose prose-invert'>
+          <!-- <h1 class="text-4xl font-bold mb-4">{frontmatter.title}</h1> -->
+          <!-- <p class="text-gray-400 mb-8">Published on {frontmatter.publishDate}</p> -->
+          <slot />
+        </article>
+      </main>
+      <Footer />
+    </div>
   </div>
-</Layout>
 
-<style is:global>
-  .prose {
-    color: #fff;
-    max-width: none;
-  }
-  .prose h1, .prose h2, .prose h3 {
-    color: #fff;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-    scroll-margin-top: 2rem;
-  }
-  .prose p {
-    margin-bottom: 1rem;
-  }
-  .prose code {
-    color: #e2e8f0;
-  }
-</style>
+  <style is:global>
+    .prose {
+      color: #fff;
+      max-width: none;
+    }
+    .prose h1,
+    .prose h2,
+    .prose h3 {
+      color: #fff;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      scroll-margin-top: 2rem;
+    }
+    .prose p {
+      margin-bottom: 1rem;
+    }
+    .prose code {
+      color: #e2e8f0;
+    }
+  </style>
+</Layout>
