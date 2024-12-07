@@ -12,7 +12,7 @@ import Example from '@/components/Example.astro';
 
 # Cached Promise
 
-When loading resources or making API calls, it's common to need the same data in multiple places. Promise caching helps avoid duplicate requests by storing and reusing the same promise. This pattern is particularly valuable for controlling expensive asynchronous operations, preventing redundant network calls, and managing shared resources efficiently.
+Need to load the same data in multiple places? Cache your promises to avoid duplicate API calls and race conditions.
 
 ## createCachedPromise()
 
@@ -21,6 +21,8 @@ When loading resources or making API calls, it's common to need the same data in
 ## createResettableCachedPromise()
 
 <CodeSnippet file="cached-promise/createResettableCachedPromise.ts" />
+
+These utilities store and reuse a promise, ensuring that expensive operations like API calls or heavy computations run only once. The resettable version allows you to clear the cache when needed, perfect for data that might change over time.
 
 ### Live Example
 
@@ -77,57 +79,28 @@ Try loading data multiple times to see how the same promise is reused:
      return response.json();
    });
 
-   // Reset cache periodically to fetch fresh flags
-   setInterval(() => {
-     loadFeatureFlags.reset();
-   }, 5 * 60 * 1000); // Every 5 minutes
+   // Refresh flags every 5 minutes
+   setInterval(loadFeatureFlags.reset, 5 * 60 * 1000);
    ```
 
-4. **Heavy Computation Memoization**
-   ```typescript
-   const generateReport = createCachedPromise(async () => {
-     const data = await fetchLargeDataset();
-     return processComplexCalculations(data);
-   });
+## Implementation Tips
 
-   // Multiple components can request the report
-   // Calculation happens only once
-   const result = await generateReport();
-   ```
-
-## Benefits and Considerations
-
-1. **Race Condition Prevention**
-   - Eliminates multiple simultaneous requests for the same resource
-   - Ensures consistent state across the application
-   - Reduces server load and network traffic
-
-2. **Resource Optimization**
-   - Prevents redundant API calls and database connections
-   - Reduces CPU usage for expensive computations
-   - Improves application performance and response times
-
-3. **Implementation Considerations**
-   - Consider cache invalidation strategies
-   - Handle error cases appropriately
-   - Implement timeouts for long-running operations
-
-## Best Practices
-
-1. **Cache Invalidation**
-   - Use resettable version when data might change
-   - Consider implementing TTL for time-sensitive data
-   - Clear cache on relevant state changes
+1. **When to Use Each Version**
+   - Use `createCachedPromise` for static data or one-time initialization
+   - Use `createResettableCachedPromise` when data needs refreshing
+   - Consider TTL for time-sensitive data (see Advanced Patterns)
 
 2. **Error Handling**
-   - Handle rejected promises appropriately
-   - Consider implementing retry logic
-   - Clear cache on certain types of errors
-
-3. **Memory Management**
-   - Clear unused caches
-   - Consider weak references for object caches
-   - Implement cache size limits for large data
+   ```typescript
+   const loadData = createResettableCachedPromise(async () => {
+     try {
+       return await api.get('/data');
+     } catch (error) {
+       loadData.reset(); // Clear failed promise
+       throw error;
+     }
+   });
+   ```
 
 ## Advanced Patterns
 
