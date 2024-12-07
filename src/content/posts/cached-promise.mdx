@@ -12,9 +12,14 @@ import Example from '@/components/Example.astro';
 
 # Cached Promise
 
-When loading resources or making API calls, it's common to need the same data in multiple places. Promise caching helps avoid duplicate requests by storing and reusing the same promise.
+When loading resources or making API calls, it's common to need the same data in multiple places. Promise caching helps avoid duplicate requests by storing and reusing the same promise. This pattern is particularly valuable for controlling expensive asynchronous operations, preventing redundant network calls, and managing shared resources efficiently.
+
+## createCachedPromise()
 
 <CodeSnippet file="cached-promise/createCachedPromise.ts" />
+
+## createResettableCachedPromise()
+
 <CodeSnippet file="cached-promise/createResettableCachedPromise.ts" />
 
 ### Live Example
@@ -25,45 +30,87 @@ Try loading data multiple times to see how the same promise is reused:
 
 ## Use Cases
 
-1. **Asset Loading**
+1. **Data Fetching in Front-End Applications**
    ```typescript
-   const loadImage = createCachedPromise(() => 
-     fetch('/large-image.jpg').then(r => r.blob())
-   );
-
-   // Used in multiple components
-   const ImageComponent = () => {
-     const [image, setImage] = useState(null);
-     useEffect(() => {
-       loadImage().then(setImage);
-     }, []);
-     // ...
-   };
-   ```
-
-2. **API Data**
-   ```typescript
-   const fetchUserProfile = createResettableCachedPromise(() => 
+   const loadUserProfile = createCachedPromise(() => 
      api.get('/user/profile')
    );
 
-   // Clear cache on logout
-   function logout() {
-     fetchUserProfile.reset();
-     // ... logout logic
+   // Multiple components can safely request the profile
+   // Only one API call will be made
+   function ProfileHeader() {
+     const [profile, setProfile] = useState(null);
+     useEffect(() => {
+       loadUserProfile().then(setProfile);
+     }, []);
+     // ...
+   }
+
+   function Settings() {
+     const [profile, setProfile] = useState(null);
+     useEffect(() => {
+       loadUserProfile().then(setProfile); // Reuses the same promise
+     }, []);
+     // ...
    }
    ```
 
-3. **Configuration Loading**
+2. **Server-Side Initialization**
    ```typescript
-   const loadConfig = createCachedPromise(async () => {
-     const response = await fetch('/config.json');
+   const initializeDatabase = createCachedPromise(async () => {
+     const connection = await createConnection(config);
+     await runMigrations();
+     return connection;
+   });
+
+   // Used across different routes/handlers
+   app.get('/api/*', async (req, res, next) => {
+     const db = await initializeDatabase(); // Connects once, reuses connection
+     // ... handle request
+   });
+   ```
+
+3. **Configuration and Feature Flags**
+   ```typescript
+   const loadFeatureFlags = createResettableCachedPromise(async () => {
+     const response = await fetch('/api/feature-flags');
      return response.json();
    });
 
-   // Used throughout the app
-   const config = await loadConfig();
+   // Reset cache periodically to fetch fresh flags
+   setInterval(() => {
+     loadFeatureFlags.reset();
+   }, 5 * 60 * 1000); // Every 5 minutes
    ```
+
+4. **Heavy Computation Memoization**
+   ```typescript
+   const generateReport = createCachedPromise(async () => {
+     const data = await fetchLargeDataset();
+     return processComplexCalculations(data);
+   });
+
+   // Multiple components can request the report
+   // Calculation happens only once
+   const result = await generateReport();
+   ```
+
+## Benefits and Considerations
+
+1. **Race Condition Prevention**
+   - Eliminates multiple simultaneous requests for the same resource
+   - Ensures consistent state across the application
+   - Reduces server load and network traffic
+
+2. **Resource Optimization**
+   - Prevents redundant API calls and database connections
+   - Reduces CPU usage for expensive computations
+   - Improves application performance and response times
+
+3. **Implementation Considerations**
+   - Consider cache invalidation strategies
+   - Handle error cases appropriately
+   - Implement timeouts for long-running operations
 
 ## Best Practices
 
