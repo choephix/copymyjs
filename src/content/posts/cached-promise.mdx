@@ -1,0 +1,140 @@
+---
+title: 'Promise Caching'
+publishDate: '2024-03-21'
+description: 'Cache and reuse promises for efficient resource loading'
+draft: true
+category: 'helpers'
+version: 1
+---
+
+import CodeSnippet from '@/components/CodeSnippet.astro';
+import Example from '@/components/Example.astro';
+
+# Cached Promise
+
+When loading resources or making API calls, it's common to need the same data in multiple places. Promise caching helps avoid duplicate requests by storing and reusing the same promise.
+
+<CodeSnippet file="cached-promise/createCachedPromise.ts" />
+<CodeSnippet file="cached-promise/createResettableCachedPromise.ts" />
+
+### Live Example
+
+Try loading data multiple times to see how the same promise is reused:
+
+<Example component="cached-promise-example" />
+
+## Use Cases
+
+1. **Asset Loading**
+   ```typescript
+   const loadImage = createCachedPromise(() => 
+     fetch('/large-image.jpg').then(r => r.blob())
+   );
+
+   // Used in multiple components
+   const ImageComponent = () => {
+     const [image, setImage] = useState(null);
+     useEffect(() => {
+       loadImage().then(setImage);
+     }, []);
+     // ...
+   };
+   ```
+
+2. **API Data**
+   ```typescript
+   const fetchUserProfile = createResettableCachedPromise(() => 
+     api.get('/user/profile')
+   );
+
+   // Clear cache on logout
+   function logout() {
+     fetchUserProfile.reset();
+     // ... logout logic
+   }
+   ```
+
+3. **Configuration Loading**
+   ```typescript
+   const loadConfig = createCachedPromise(async () => {
+     const response = await fetch('/config.json');
+     return response.json();
+   });
+
+   // Used throughout the app
+   const config = await loadConfig();
+   ```
+
+## Best Practices
+
+1. **Cache Invalidation**
+   - Use resettable version when data might change
+   - Consider implementing TTL for time-sensitive data
+   - Clear cache on relevant state changes
+
+2. **Error Handling**
+   - Handle rejected promises appropriately
+   - Consider implementing retry logic
+   - Clear cache on certain types of errors
+
+3. **Memory Management**
+   - Clear unused caches
+   - Consider weak references for object caches
+   - Implement cache size limits for large data
+
+## Advanced Patterns
+
+### With Timeout
+
+```typescript
+function createTimedCachedPromise<T>(
+  fn: () => Promise<T>,
+  ttlMs: number
+) {
+  let cachedPromise: Promise<T> | null = null;
+  let expireTimeout: ReturnType<typeof setTimeout>;
+
+  return () => {
+    if (!cachedPromise) {
+      cachedPromise = fn();
+      expireTimeout = setTimeout(() => {
+        cachedPromise = null;
+      }, ttlMs);
+    }
+    return cachedPromise;
+  };
+}
+```
+
+### With Retry Logic
+
+```typescript
+function createRetryingCachedPromise<T>(
+  fn: () => Promise<T>,
+  maxRetries = 3
+) {
+  let cachedPromise: Promise<T> | null = null;
+  let attempts = 0;
+
+  const execute = async () => {
+    try {
+      return await fn();
+    } catch (error) {
+      if (attempts < maxRetries) {
+        attempts++;
+        cachedPromise = null;
+        return execute();
+      }
+      throw error;
+    }
+  };
+
+  return () => {
+    if (!cachedPromise) {
+      attempts = 0;
+      cachedPromise = execute();
+    }
+    return cachedPromise;
+  };
+}
+```
