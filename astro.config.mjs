@@ -1,9 +1,9 @@
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
-import tailwind from '@astrojs/tailwind';
+import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-  integrations: [mdx(), tailwind()],
+  integrations: [mdx()],
   markdown: {
     shikiConfig: {
       theme: 'github-dark',
@@ -16,5 +16,6 @@ export default defineConfig({
         '@': '/src',
       },
     },
+    plugins: [tailwindcss()],
   },
 });
