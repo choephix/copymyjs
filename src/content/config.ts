@@ -9,6 +9,7 @@ const posts = defineCollection({
     draft: z.boolean().optional(),
     category: z.string().optional(),
     version: z.union([z.string(), z.number()]).optional(),
+    folder: z.string().optional(),
   }),
 });
 

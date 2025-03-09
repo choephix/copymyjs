@@ -4,22 +4,25 @@ interface Props {
   namedExport?: string;
 }
 
-// Configurable watermark text
-const WATERMARK_TEXT = 'Try it out';
+// const LABEL_TEXT = 'Try it here';
+const LABEL_TEXT = 'Live Demo';
 
 const { component, namedExport } = Astro.props;
 ---
 
 <div class='example-container mt-6'>
-  <div
-    class='example-content border border-gray-700 rounded overflow-hidden bg-[#212f4d] min-h-[200px] relative'
-    data-example={component}
-    data-named-export={namedExport}
-  >
-    <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-      <span class="text-white/5 text-4xl font-bold all-small-caps rotate-[-20deg]">
-        {WATERMARK_TEXT}
-      </span>
+  <div class='relative flex flex-col'>
+    <div
+      class='z-10 self-center px-3 py-0.5 -mb-px text-xs font-medium text-white/70 bg-[#212f4d] 
+      border-t border-x border-gray-700 rounded-t-lg select-none'
+    >
+      {LABEL_TEXT}
+    </div>
+    <div
+      class='example-content border border-gray-700 rounded overflow-hidden bg-[#212f4d] min-h-[200px]'
+      data-example={component}
+      data-named-export={namedExport}
+    >
     </div>
   </div>
 </div>

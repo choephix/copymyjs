@@ -1,0 +1,160 @@
+---
+title: 'Promise Caching'
+publishDate: '2024-03-21'
+description: 'Cache and reuse promises for efficient resource loading'
+draft: true
+category: 'helpers'
+version: 1
+---
+
+import CodeSnippet from '@/components/CodeSnippet.astro';
+import Example from '@/components/Example.astro';
+
+# Cached Promise
+
+Need to load the same data in multiple places? Cache your promises to avoid duplicate API calls and race conditions.
+
+## createCachedPromise()
+
+<CodeSnippet file="cached-promise/createCachedPromise.ts" />
+
+## createResettableCachedPromise()
+
+<CodeSnippet file="cached-promise/createResettableCachedPromise.ts" />
+
+These utilities store and reuse a promise, ensuring that expensive operations like API calls or heavy computations run only once. The resettable version allows you to clear the cache when needed, perfect for data that might change over time.
+
+### Live Example
+
+Try loading data multiple times to see how the same promise is reused:
+
+<Example component="cached-promise-example" />
+
+## Use Cases
+
+1. **Data Fetching in Front-End Applications**
+   ```typescript
+   const loadUserProfile = createCachedPromise(() => 
+     api.get('/user/profile')
+   );
+
+   // Multiple components can safely request the profile
+   // Only one API call will be made
+   function ProfileHeader() {
+     const [profile, setProfile] = useState(null);
+     useEffect(() => {
+       loadUserProfile().then(setProfile);
+     }, []);
+     // ...
+   }
+
+   function Settings() {
+     const [profile, setProfile] = useState(null);
+     useEffect(() => {
+       loadUserProfile().then(setProfile); // Reuses the same promise
+     }, []);
+     // ...
+   }
+   ```
+
+2. **Server-Side Initialization**
+   ```typescript
+   const initializeDatabase = createCachedPromise(async () => {
+     const connection = await createConnection(config);
+     await runMigrations();
+     return connection;
+   });
+
+   // Used across different routes/handlers
+   app.get('/api/*', async (req, res, next) => {
+     const db = await initializeDatabase(); // Connects once, reuses connection
+     // ... handle request
+   });
+   ```
+
+3. **Configuration and Feature Flags**
+   ```typescript
+   const loadFeatureFlags = createResettableCachedPromise(async () => {
+     const response = await fetch('/api/feature-flags');
+     return response.json();
+   });
+
+   // Refresh flags every 5 minutes
+   setInterval(loadFeatureFlags.reset, 5 * 60 * 1000);
+   ```
+
+## Implementation Tips
+
+1. **When to Use Each Version**
+   - Use `createCachedPromise` for static data or one-time initialization
+   - Use `createResettableCachedPromise` when data needs refreshing
+   - Consider TTL for time-sensitive data (see Advanced Patterns)
+
+2. **Error Handling**
+   ```typescript
+   const loadData = createResettableCachedPromise(async () => {
+     try {
+       return await api.get('/data');
+     } catch (error) {
+       loadData.reset(); // Clear failed promise
+       throw error;
+     }
+   });
+   ```
+
+## Advanced Patterns
+
+### With Timeout
+
+```typescript
+function createTimedCachedPromise<T>(
+  fn: () => Promise<T>,
+  ttlMs: number
+) {
+  let cachedPromise: Promise<T> | null = null;
+  let expireTimeout: ReturnType<typeof setTimeout>;
+
+  return () => {
+    if (!cachedPromise) {
+      cachedPromise = fn();
+      expireTimeout = setTimeout(() => {
+        cachedPromise = null;
+      }, ttlMs);
+    }
+    return cachedPromise;
+  };
+}
+```
+
+### With Retry Logic
+
+```typescript
+function createRetryingCachedPromise<T>(
+  fn: () => Promise<T>,
+  maxRetries = 3
+) {
+  let cachedPromise: Promise<T> | null = null;
+  let attempts = 0;
+
+  const execute = async () => {
+    try {
+      return await fn();
+    } catch (error) {
+      if (attempts < maxRetries) {
+        attempts++;
+        cachedPromise = null;
+        return execute();
+      }
+      throw error;
+    }
+  };
+
+  return () => {
+    if (!cachedPromise) {
+      attempts = 0;
+      cachedPromise = execute();
+    }
+    return cachedPromise;
+  };
+}
+```

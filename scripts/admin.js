@@ -17,7 +17,7 @@ const colors = {
   bold: '\x1b[1m',
 };
 
-async function parsePostFrontmatter(content) {
+async function parsePostFrontmatter(content, file) {
   const frontmatterMatch = content.match(/---\n([\s\S]*?)\n---/);
   if (!frontmatterMatch) return {};
 
@@ -33,31 +33,38 @@ async function parsePostFrontmatter(content) {
     frontmatter[key.trim()] = value.replace(/^["']|["']$/g, '');
   }
 
+  // Add folder from file path
+  const folder = path.dirname(file).split('/').pop();
+  frontmatter.folder = folder || 'root';
+
   return frontmatter;
 }
 
 async function getAllPosts() {
-  const files = await fs.readdir(POSTS_DIR);
+  const files = await fs.readdir(POSTS_DIR, { recursive: true });
   const showFilenames = process.argv.includes('--byfilename');
 
   const posts = await Promise.all(
-    files.map(async file => {
-      const content = await fs.readFile(path.join(POSTS_DIR, file), 'utf-8');
-      const frontmatter = await parsePostFrontmatter(content);
-      const isDraft = frontmatter.draft === 'true';
-      const publishDate = new Date(frontmatter.publishDate);
-      const isScheduled = !isDraft && publishDate > new Date();
+    files
+      .filter(file => file.endsWith('.mdx'))
+      .map(async file => {
+        const content = await fs.readFile(path.join(POSTS_DIR, file), 'utf-8');
+        const frontmatter = await parsePostFrontmatter(content, file);
+        const isDraft = frontmatter.draft === 'true';
+        const publishDate = new Date(frontmatter.publishDate);
+        const isScheduled = !isDraft && publishDate > new Date();
 
-      return {
-        file,
-        title: showFilenames ? file.replace('.mdx', '') : frontmatter.title,
-        category: frontmatter.category || 'uncategorized',
-        isDraft,
-        isScheduled,
-        publishDate,
-        willBeDraft: isDraft,
-      };
-    })
+        return {
+          file,
+          title: showFilenames ? file.replace('.mdx', '') : frontmatter.title,
+          category: frontmatter.category || 'uncategorized',
+          folder: frontmatter.folder,
+          isDraft,
+          isScheduled,
+          publishDate,
+          willBeDraft: isDraft,
+        };
+      })
   );
 
   // Sort by category and then by title
