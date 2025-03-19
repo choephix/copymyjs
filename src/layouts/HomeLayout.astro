@@ -14,28 +14,44 @@ const tsLangStyle = `${jstsLangStyle} bg-[#3178c6] text-white`;
 ---
 
 <Layout title={title}>
-  <main class='max-w-3xl mx-auto px-4 py-8'>
-    <div class='text-center mb-16'>
-      <img 
-        src='/copymyjs-doodle-xs.png' 
-        alt='CopyMyJS Logo' 
-        class='mx-auto mb-8 mt-16 w-28 h-28' 
+  <div class="relative overflow-hidden">
+    <picture>
+      <!-- <source srcset="/glow.avif" type="image/avif" /> -->
+      <source srcset="/glow2.png" type="image/png" />
+      <img
+        alt=""
+        fetchpriority="high"
+        width="1800"
+        height="1800"
+        decoding="async"
+        class="pointer-events-none absolute left-1/2 top-[25vmin] z-10 h-[100vh] max-w-none -translate-x-1/2 -translate-y-1/2 select-none mix-blend-overlay opacity-40"
+        src="/glow.avif"
       />
-      <h1 class='text-5xl font-bold mb-16 text-white'>
-        Copy My
-        <span class={jsLangStyle}>js</span> / <span class={tsLangStyle}>ts</span>
-      </h1>
-      <div class='bg-gray-800/50 p-8 rounded-lg border border-gray-700 mb-8'>
-        <p class='text-xl text-gray-300 mb-4'>
-          A collection of battle-tested, type-safe, copy-paste ready snippets for your projects.
-        </p>
-        <p class='text-gray-400'>
-          Each snippet comes with live examples, TypeScript types, and zero dependencies. 
-          Just copy, paste, and code away!
-        </p>
+    </picture>
+    
+    <main class='max-w-3xl mx-auto px-4 py-8'>
+      <div class='text-center mb-16'>
+        <img 
+          src='/copymyjs-doodle-xs.png' 
+          alt='CopyMyJS Logo' 
+          class='mx-auto mb-8 mt-16 w-28 h-28' 
+        />
+        <h1 class='text-5xl font-bold mb-16 text-white'>
+          Copy My
+          <span class={jsLangStyle}>js</span> / <span class={tsLangStyle}>ts</span>
+        </h1>
+        <div class='bg-gray-800/50 p-8 rounded-lg border border-gray-700 mb-8'>
+          <p class='text-xl text-gray-300 mb-4'>
+            A collection of battle-tested, type-safe, copy-paste ready snippets for your projects.
+          </p>
+          <p class='text-gray-400'>
+            Each snippet comes with live examples, TypeScript types, and zero dependencies. 
+            Just copy, paste, and code away!
+          </p>
+        </div>
       </div>
-    </div>
 
-    <slot />
-  </main>
+      <slot />
+    </main>
+  </div>
 </Layout> 
