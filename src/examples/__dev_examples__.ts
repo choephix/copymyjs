@@ -35,7 +35,6 @@ export function example1(container: HTMLElement) {
 
 export function example2(container: HTMLElement) {
   const builder = createExampleLayoutBuilder(container);
-  const { logger } = builder;
 
   builder.addHtml(`
     <div class="flex gap-4 items-center">
@@ -56,7 +55,7 @@ export function example2(container: HTMLElement) {
     if (isTyping) return;
     isTyping = true;
     output.textContent = '';
-    logger.log('Started typing...');
+    builder.logger.log('Started typing...');
 
     for (const char of message) {
       output.textContent += char;
@@ -64,7 +63,7 @@ export function example2(container: HTMLElement) {
     }
 
     isTyping = false;
-    logger.log('Finished typing!');
+    builder.logger.log('Finished typing!');
   }
 
   btn.addEventListener('click', typeMessage);
@@ -72,7 +71,6 @@ export function example2(container: HTMLElement) {
 
 export function example3(container: HTMLElement) {
   const builder = createExampleLayoutBuilder(container);
-  const { logger } = builder;
 
   builder.addHtml(`
     <div class="flex gap-4 items-center">
@@ -90,7 +88,7 @@ export function example3(container: HTMLElement) {
   async function bounce() {
     if (isAnimating) return;
     isAnimating = true;
-    logger.log('Starting bounce animation');
+    builder.logger.log('Starting bounce animation');
 
     const positions = ['-translate-y-16', 'translate-y-0'];
 
@@ -102,7 +100,7 @@ export function example3(container: HTMLElement) {
     }
 
     isAnimating = false;
-    logger.log('Bounce animation complete');
+    builder.logger.log('Bounce animation complete');
   }
 
   btn.addEventListener('click', bounce);
@@ -110,7 +108,6 @@ export function example3(container: HTMLElement) {
 
 export function example0(container: HTMLElement) {
   const builder = createExampleLayoutBuilder(container);
-  const { logger } = builder;
 
   builder.addHtml(`
     <div class="flex flex-col gap-4">
@@ -143,7 +140,7 @@ export function example0(container: HTMLElement) {
 
   logBtn.addEventListener('click', () => {
     const randomIndex = Math.floor(Math.random() * randomMessages.length);
-    logger.log(randomMessages[randomIndex]);
+    builder.logger.log(randomMessages[randomIndex]);
   });
 
   addItemBtn.addEventListener('click', () => {
@@ -151,6 +148,6 @@ export function example0(container: HTMLElement) {
     const li = document.createElement('li');
     li.textContent = `Dynamically added item ${itemCount}`;
     itemList.appendChild(li);
-    logger.log(`Added item ${itemCount}`);
+    builder.logger.log(`Added item ${itemCount}`);
   });
 }
