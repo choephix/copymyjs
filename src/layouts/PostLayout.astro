@@ -13,7 +13,7 @@ const { frontmatter, headings } = Astro.props;
     <!-- Main content -->
     <div class='flex-1 mx-auto px-8 py-12'>
       <main class='flex-1 max-w-4xl mx-auto'>
-        <article class='prose prose-invert'>
+        <article class='markdown-content'>
           <!-- <h1 class="text-4xl font-bold mb-4">{frontmatter.folder}</h1> -->
           <!-- <h1 class="text-4xl font-bold mb-4">{frontmatter.title}</h1> -->
           <!-- <p class="text-gray-400 mb-8">Published on {frontmatter.publishDate}</p> -->
@@ -23,25 +23,4 @@ const { frontmatter, headings } = Astro.props;
       <Footer />
     </div>
   </div>
-
-  <style is:global>
-    .prose {
-      color: #fff;
-      max-width: none;
-    }
-    .prose h1,
-    .prose h2,
-    .prose h3 {
-      color: #fff;
-      margin-top: 2rem;
-      margin-bottom: 1rem;
-      scroll-margin-top: 2rem;
-    }
-    .prose p {
-      margin-bottom: 1rem;
-    }
-    .prose code {
-      color: #e2e8f0;
-    }
-  </style>
 </Layout>
