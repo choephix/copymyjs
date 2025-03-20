@@ -3,6 +3,7 @@ import { Copy } from 'lucide-astro';
 import { Code } from 'astro:components';
 
 import { stripComments } from '@/utils/code/stripComments';
+import { extractRegion } from '@/utils/code/extractRegion';
 // import { stripTypes } from '@/utils/code/stripTypes';
 import ErrorBanner from './ErrorBanner.astro';
 
@@ -11,9 +12,10 @@ import ErrorBanner from './ErrorBanner.astro';
 
 interface Props {
   file: string;
+  region?: string;
 }
 
-const { file } = Astro.props;
+const { file, region } = Astro.props;
 
 // Import all snippet files
 const snippetFiles = import.meta.glob<string>('/src/snippets/**/*.ts', {
@@ -30,6 +32,8 @@ let fileExists = false;
 
 if (filePath in snippetFiles) {
   code = await snippetFiles[filePath]();
+  // Extract region if specified
+  code = extractRegion(code, region);
   codeNoComments = stripComments(code);
   // codeNoTypes = stripTypes(code);
   // codeNoCommentsNoTypes = stripComments(stripTypes(code));
