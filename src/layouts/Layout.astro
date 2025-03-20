@@ -116,8 +116,17 @@ const { title, showHomeLink = false } = Astro.props;
     @apply list-decimal list-inside mb-4 text-gray-300;
   }
 
-  .markdown-content li {
+  .markdown-content ol li {
     @apply mb-2;
+  }
+
+  /* Fix for numbered lists with bold text */
+  .markdown-content ol li strong {
+    @apply inline-block;
+  }
+
+  .markdown-content ol li p {
+    @apply inline-block mb-0;
   }
 
   .markdown-content a {

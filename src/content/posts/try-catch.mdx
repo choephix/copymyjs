@@ -1,0 +1,83 @@
+---
+title: "Type-Safe Error Handling with tryCatch"
+description: "A utility function for handling async operations with proper TypeScript types and error handling"
+category: 'helpers'
+publishDate: "2024-03-20"
+draft: true
+version: 0
+---
+
+import CodeSnippet from '@/components/CodeSnippet.astro';
+import Example from '@/components/Example.astro';
+
+# Type-Safe Error Handling with tryCatch
+
+Error handling in async operations can be tricky, especially when working with TypeScript. The `tryCatch` utility function provides a clean, type-safe way to handle both successful and failed async operations.
+
+## The Utility Function
+
+<CodeSnippet file="trycatch/tryCatch.ts" />
+
+The `tryCatch` function is a generic utility that wraps any Promise and returns a discriminated union type `Result<T, E>`. This type ensures that we always handle both success and error cases explicitly.
+
+## Type Safety
+
+The function uses TypeScript generics to provide full type safety:
+
+- `T`: The type of the successful result
+- `E`: The type of the error (defaults to `Error`)
+
+The return type is a discriminated union:
+```typescript
+type Result<T, E = Error> = 
+  | { data: T; error: null }    // Success case
+  | { data: null; error: E }    // Error case
+```
+
+## Usage Example
+
+<Example component="try-catch-example" namedExport="tryCatchExample" />
+
+Try clicking the buttons above to see the `tryCatch` function in action. The success case returns the data with a null error, while the error case returns null data with the error object.
+
+## Real-World Example
+
+Here's how you might use it in a real application:
+
+```typescript
+async function fetchUserData(userId: string) {
+  const result = await tryCatch(
+    fetch(`/api/users/${userId}`).then(res => res.json())
+  );
+
+  if (result.error) {
+    console.error('❌ Failed to fetch user:', result.error);
+    return null;
+  }
+
+  return result.data;
+}
+```
+
+## Benefits
+
+1. **Type Safety**: TypeScript will ensure you handle both success and error cases
+2. **Clean API**: No need for try/catch blocks in your business logic
+3. **Predictable Structure**: The result is always an object with `data` and `error` properties
+4. **Flexible Error Types**: You can specify custom error types when needed
+
+## When to Use
+
+- When handling async operations that might fail
+- When you want type-safe error handling
+- When you need to handle errors without try/catch blocks
+- When working with external APIs or services
+
+## Best Practices
+
+1. Always check for `result.error` before accessing `result.data`
+2. Use TypeScript's type narrowing to handle the discriminated union
+3. Consider creating custom error types for specific use cases
+4. Use the error information for logging and user feedback
+
+The `tryCatch` utility makes error handling more predictable and type-safe in your TypeScript applications. It's particularly useful in larger applications where proper error handling is crucial for reliability and maintainability. 

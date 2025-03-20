@@ -16,9 +16,25 @@ alwaysApply: false
   const builder = createExampleLayoutBuilder(container);
   ```
 
-3. Add new page content to "src/content/posts/article-slug.mdx". Combine regular markdown for the article text; with `<CodeSnippet file="path-to-file" />` to directly print a code snippet file as-is; as well as `<Example component="path-to-example-file" namedExport="function-name" />` to embed a live example in the article.
+3. Add new page content to "src/content/posts/article-slug.mdx". You can combine:
+  - regular markdown for the article text; 
+  - `<CodeSnippet file="path-to-file" />` to directly print a code snippet file as-is. (path relative to src/snippets/, no extension)
+  - `<Example component="path-to-example-file" namedExport="function-name" />` to embed a live example in the article. (path relative to src/snippets/, no extention)
 
-# Examples
+## Notes:
 
-- [lipsum.mdx](mdc:src/content/posts/dev/lipsum.mdx)
-- [cached-promise.mdx](mdc:src/content/posts/cached-promise.mdx)
+- All filenames must be kebab-case
+- Content front-matter for the .mdx:
+  ```yaml
+  ---
+  title: "Appropriate user-readable title"
+  description: "Appropriate, slighly catchy description"
+  category: 'helpers/classic'
+  publishDate: "yyyy-mm-dd" (current date)
+  ---
+  ```
+
+## Examples
+
+- @lipsum.mdx
+- @cached-promise.mdx
