@@ -1,0 +1,93 @@
+---
+title: "ManyReasons"
+description: "A utility class for managing multiple reasons or conditions that can be added and removed dynamically"
+category: 'helpers'
+publishDate: "2024-03-20"
+---
+
+import CodeSnippet from '@/components/CodeSnippet.astro';
+import Example from '@/components/Example.astro';
+
+# ManyReasons
+
+A utility class for managing multiple reasons or conditions that can be added and removed dynamically. It's particularly useful for tracking multiple independent reasons why something should be in a particular state.
+
+## Features
+
+- Track multiple reasons using unique identifiers
+- Automatic state management with callbacks
+- Promise-based temporary reason tracking
+- Parent-child relationship support
+- Type-safe implementation
+
+## Basic Usage
+
+```typescript
+const reasons = new ManyReasons();
+
+// Add a reason
+const cleanup = reasons.add('loading');
+
+// Remove the reason
+cleanup();
+
+// Or remove directly
+reasons.remove('loading');
+```
+
+## Callbacks
+
+```typescript
+const reasons = new ManyReasons();
+
+reasons.onChange = (hasReasons) => {
+  console.log('🎯 Reasons state changed:', hasReasons);
+};
+
+reasons.onEmpty = () => {
+  console.log('✨ All reasons cleared');
+};
+
+reasons.onNonEmpty = () => {
+  console.log('🔔 First reason added');
+};
+```
+
+## Promise-based Usage
+
+```typescript
+const reasons = new ManyReasons();
+
+// Add a reason that will be automatically removed when the promise resolves
+reasons.addDuring('loading', fetchData());
+```
+
+## Parent-Child Relationships
+
+```typescript
+const parentReasons = new ManyReasons();
+const childReasons = new ManyReasons();
+
+// Make parent reasons affect child reasons
+parentReasons.makeParentTo(childReasons);
+
+// When parent has reasons, child will automatically get them
+parentReasons.add('parentReason');
+// childReasons now has the parent reason
+```
+
+## Debugging
+
+```typescript
+// Helper function to debug multiple reason maps
+const debugReasons = <T extends Record<string, ManyReasons>>(map: T) => {
+  return Object.assign(map, {
+    toString() {
+      return Object.entries(map)
+        .filter(([, reasons]) => reasons instanceof ManyReasons && reasons.hasAny())
+        .map(([key, reasons]) => `"${key}": ${reasons}`)
+        .join('\n');
+    },
+  });
+};
+```

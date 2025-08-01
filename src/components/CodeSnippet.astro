@@ -4,6 +4,7 @@ import { Code } from 'astro:components';
 
 import { stripComments } from '@/utils/code/stripComments';
 import { extractRegion } from '@/utils/code/extractRegion';
+import { stripExports } from '@/utils/code/stripExports';
 // import { stripTypes } from '@/utils/code/stripTypes';
 import ErrorBanner from './ErrorBanner.astro';
 
@@ -26,6 +27,7 @@ const filePath = `/src/snippets/${file}`;
 
 let code = '';
 let codeNoComments = '';
+let codeNoExports = '';
 // let codeNoTypes = '';
 // let codeNoCommentsNoTypes = '';
 let fileExists = false;
@@ -35,6 +37,7 @@ if (filePath in snippetFiles) {
   // Extract region if specified
   code = extractRegion(code, region);
   codeNoComments = stripComments(code);
+  codeNoExports = stripExports(codeNoComments);
   // codeNoTypes = stripTypes(code);
   // codeNoCommentsNoTypes = stripComments(stripTypes(code));
   fileExists = true;
@@ -42,8 +45,10 @@ if (filePath in snippetFiles) {
 ---
 
 {
+  // #C792EA #82aaff
   fileExists ? (
-    <div class='snippet-container relative group'>
+    <div class='snippet-container relative group 
+    border border-[#C792EA] border-1 rounded-lg'>
       <button
         class='copy-button absolute top-3 right-3 p-2 rounded-lg bg-gray-800/50 hover:bg-gray-700/50 opacity-0 group-hover:opacity-100 transition-opacity'
         aria-label='Copy code'
@@ -53,7 +58,7 @@ if (filePath in snippetFiles) {
       </button>
       {/* <Code code={codeNoComments} lang='ts' theme='tokyo-night' /> */}
       {/* <Code code={codeNoComments} lang='ts' theme='houston' /> */}
-      <Code code={codeNoComments} lang='ts' theme='material-theme-ocean' />
+      <Code code={codeNoExports} lang='ts' theme='material-theme-ocean' />
       {/* <Code code={codeNoComments} lang='ts' theme='github-dark-default' /> */}
     </div>
   ) : (

@@ -6,7 +6,7 @@ export default defineConfig({
   integrations: [mdx()],
   markdown: {
     shikiConfig: {
-      theme: 'github-dark',
+      theme: 'material-theme-ocean',  // or 'material-theme' for a similar dark theme
       wrap: true,
     },
   },

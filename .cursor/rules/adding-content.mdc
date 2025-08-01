@@ -18,7 +18,7 @@ alwaysApply: false
 
 3. Add new page content to "src/content/posts/article-slug.mdx". You can combine:
   - regular markdown for the article text; 
-  - `<CodeSnippet file="path-to-file" />` to directly print a code snippet file as-is. (path relative to src/snippets/, no extension)
+  - `<CodeSnippet file="path-to-file" />` to directly print a code snippet file as-is. (path relative to src/snippets/, with extension)
   - `<Example component="path-to-example-file" namedExport="function-name" />` to embed a live example in the article. (path relative to src/snippets/, no extention)
 
 ## Notes:
@@ -29,7 +29,7 @@ alwaysApply: false
   ---
   title: "Appropriate user-readable title"
   description: "Appropriate, slighly catchy description"
-  category: 'helpers/classic'
+  category: 'helpers' / 'classic'
   publishDate: "yyyy-mm-dd" (current date)
   ---
   ```

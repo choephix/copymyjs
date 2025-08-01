@@ -1,0 +1,109 @@
+---
+title: "Delay"
+description: "Two simple Promise-based functions to pause execution for a specified duration in seconds or milliseconds"
+category: 'classic'
+publishDate: "2024-03-20"
+---
+
+import CodeSnippet from '@/components/CodeSnippet.astro';
+import Example from '@/components/Example.astro';
+
+# Delay
+
+A simple promise-based timing function.
+
+## delaySeconds()
+
+<CodeSnippet file="async-delay/delaySeconds.ts" />
+
+This function takes a number of seconds and returns a Promise that resolves after that delay. It's perfect for human-readable timing scenarios like "wait 2 seconds" or "delay 5 seconds".
+
+## delayMilliseconds()
+
+If you prefer to work with milliseconds for consistency with `setTimeout` and `setInterval`, here's the milliseconds version:
+
+<CodeSnippet file="async-delay/delayMilliseconds.ts" />
+
+## Usage
+
+```typescript
+await delaySeconds(2);
+await delayMilliseconds(1000);
+```
+
+## Live Example
+
+Here's a live example showing both functions in action:
+
+<Example component="delay-example" namedExport="delayExample" />
+
+## Common Use Cases
+
+1. **Rate Limiting**
+   ```typescript
+   async function fetchWithRateLimit(url: string) {
+     await delayMilliseconds(1000); // Wait 1 second between requests
+     return fetch(url);
+   }
+   ```
+
+2. **Animation Sequences**
+   ```typescript
+   async function animateSequence() {
+     element.classList.add('fade-in');
+     await delayMilliseconds(500);
+     element.classList.add('slide-in');
+     await delayMilliseconds(300);
+     element.classList.add('highlight');
+   }
+   ```
+
+3. **Testing**
+   ```typescript
+   async function testAsyncBehavior() {
+     const start = Date.now();
+     await delaySeconds(2);
+     const duration = Date.now() - start;
+     console.log(`⏱️ Duration: ${duration}ms`);
+   }
+   ```
+
+## Best Practices
+
+1. **Use Appropriate Units**: 
+   - Use `delaySeconds` for human-readable delays (e.g., 2s, 5s)
+   - Use `delayMilliseconds` for precise timing (e.g., 500ms, 1000ms)
+
+2. **Error Handling**:
+   ```typescript
+   try {
+     await delayMilliseconds(1000);
+     // Continue with operation
+   } catch (error) {
+     console.error('❌ Delay interrupted:', error);
+   }
+   ```
+
+3. **Cancellation**:
+   If you need to cancel a delay, consider using `AbortController`:
+   ```typescript
+   const controller = new AbortController();
+   const timeout = setTimeout(() => controller.abort(), 5000);
+   
+   try {
+     await Promise.race([
+       delayMilliseconds(10000),
+       new Promise((_, reject) => 
+         controller.signal.addEventListener('abort', () => reject(new Error('Cancelled')))
+       )
+     ]);
+   } finally {
+     clearTimeout(timeout);
+   }
+   ```
+
+## Conclusion
+
+These delay utilities are simple yet powerful tools that should be in every JavaScript/TypeScript developer's toolkit. They provide a clean, Promise-based way to introduce delays in your code, making them perfect for a wide range of use cases from animations to rate limiting.
+
+Remember that while these functions are great for development and testing, in production you might want to consider more sophisticated timing mechanisms depending on your specific needs, such as `requestAnimationFrame` for animations or proper rate limiting libraries for API calls. 
