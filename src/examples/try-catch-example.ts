@@ -1,9 +1,9 @@
-import { tryCatch } from '../snippets/trycatch/tryCatch';
+import { tryCatch } from '@/snippets/trycatch/tryCatch';
 import { createExampleLayoutBuilder } from './core/createExampleLayoutBuilder';
 
 export function tryCatchExample(container: HTMLElement) {
   const builder = createExampleLayoutBuilder(container);
-  
+
   builder.addHtml(`
     <div class="space-y-4">
       <h3 class="text-lg font-semibold">TryCatch Examples</h3>
@@ -19,16 +19,25 @@ export function tryCatchExample(container: HTMLElement) {
   const successBtn = container.querySelector('#successBtn') as HTMLButtonElement;
   const errorBtn = container.querySelector('#errorBtn') as HTMLButtonElement;
 
-  const displayResult = (result: any) => {
-    resultDiv.innerHTML = `
-      <pre class="text-sm">${JSON.stringify(result, null, 2)}</pre>
-    `;
+  const stringifyResult = (result: unknown) =>
+    JSON.stringify(
+      result,
+      (_key, value: unknown) =>
+        value instanceof Error
+          ? { name: value.name, message: value.message }
+          : value,
+      2
+    );
+
+  const displayResult = (result: unknown) => {
+    const pre = document.createElement('pre');
+    pre.className = 'text-sm';
+    pre.textContent = stringifyResult(result);
+    resultDiv.replaceChildren(pre);
   };
 
   successBtn.addEventListener('click', async () => {
-    const result = await tryCatch(
-      new Promise((resolve) => resolve('🎉 Success!'))
-    );
+    const result = await tryCatch(new Promise(resolve => resolve('🎉 Success!')));
     displayResult(result);
   });
 
@@ -38,4 +47,4 @@ export function tryCatchExample(container: HTMLElement) {
     );
     displayResult(result);
   });
-} 
+}
