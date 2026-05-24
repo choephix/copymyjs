@@ -1,3 +1,6 @@
+const escapeRegExp = (value: string) =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 /**
  * Extracts a specific region from TypeScript code using region markers
  * @param code The TypeScript code string to process
@@ -8,8 +11,10 @@ export function extractRegion(code: string, regionName?: string): string {
   if (!regionName) return code;
 
   const regionRegex = new RegExp(
-    `//#region\\s+${regionName}\\s*\\n([\\s\\S]*?)\\n\\s*//#endregion`,
-    'i'
+    `^[\\t ]*//\\s*#region\\s+${escapeRegExp(
+      regionName
+    )}\\s*\\r?\\n([\\s\\S]*?)\\r?\\n[\\t ]*//\\s*#endregion\\b.*$`,
+    'im'
   );
 
   const match = code.match(regionRegex);

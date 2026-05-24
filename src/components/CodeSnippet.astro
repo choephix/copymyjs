@@ -1,15 +1,11 @@
 ---
-import { Copy } from 'lucide-astro';
 import { Code } from 'astro:components';
+import { Copy } from 'lucide-astro';
 
-import { stripComments } from '@/utils/code/stripComments';
-import { extractRegion } from '@/utils/code/extractRegion';
-import { stripExports } from '@/utils/code/stripExports';
-// import { stripTypes } from '@/utils/code/stripTypes';
 import ErrorBanner from './ErrorBanner.astro';
-
-// const shouldStripTypes = false;
-// const shouldStripComments = true;
+import { extractRegion } from '@/utils/code/extractRegion';
+import { stripComments } from '@/utils/code/stripComments';
+import { stripExports } from '@/utils/code/stripExports';
 
 interface Props {
   file: string;
@@ -18,7 +14,6 @@ interface Props {
 
 const { file, region } = Astro.props;
 
-// Import all snippet files
 const snippetFiles = import.meta.glob<string>('/src/snippets/**/*.ts', {
   query: '?raw',
   import: 'default',
@@ -26,29 +21,19 @@ const snippetFiles = import.meta.glob<string>('/src/snippets/**/*.ts', {
 const filePath = `/src/snippets/${file}`;
 
 let code = '';
-let codeNoComments = '';
 let codeNoExports = '';
-// let codeNoTypes = '';
-// let codeNoCommentsNoTypes = '';
 let fileExists = false;
 
 if (filePath in snippetFiles) {
-  code = await snippetFiles[filePath]();
-  // Extract region if specified
-  code = extractRegion(code, region);
-  codeNoComments = stripComments(code);
-  codeNoExports = stripExports(codeNoComments);
-  // codeNoTypes = stripTypes(code);
-  // codeNoCommentsNoTypes = stripComments(stripTypes(code));
+  code = extractRegion(await snippetFiles[filePath](), region);
+  codeNoExports = stripExports(stripComments(code));
   fileExists = true;
 }
 ---
 
 {
-  // #C792EA #82aaff
   fileExists ? (
-    <div class='snippet-container relative group 
-    border border-[#C792EA] border-1 rounded-lg'>
+    <div class='snippet-container relative group border border-[#C792EA] rounded-lg'>
       <button
         class='copy-button absolute top-3 right-3 p-2 rounded-lg bg-gray-800/50 hover:bg-gray-700/50 opacity-0 group-hover:opacity-100 transition-opacity'
         aria-label='Copy code'
@@ -56,10 +41,7 @@ if (filePath in snippetFiles) {
       >
         <Copy class='w-5 h-5 text-gray-400' />
       </button>
-      {/* <Code code={codeNoComments} lang='ts' theme='tokyo-night' /> */}
-      {/* <Code code={codeNoComments} lang='ts' theme='houston' /> */}
       <Code code={codeNoExports} lang='ts' theme='material-theme-ocean' />
-      {/* <Code code={codeNoComments} lang='ts' theme='github-dark-default' /> */}
     </div>
   ) : (
     <ErrorBanner message={`Snippet file not found: ${file}`} />
@@ -110,10 +92,13 @@ if (filePath in snippetFiles) {
   document.querySelectorAll('.copy-button').forEach(button => {
     button.addEventListener('click', async () => {
       const code = button.getAttribute('data-code');
-      if (code) {
+      if (!code) {
+        return;
+      }
+
+      try {
         await navigator.clipboard.writeText(code);
 
-        // Visual feedback
         const icon = button.querySelector('svg');
         if (icon) {
           icon.classList.add('text-green-400');
@@ -121,6 +106,8 @@ if (filePath in snippetFiles) {
             icon.classList.remove('text-green-400');
           }, 1000);
         }
+      } catch (error) {
+        console.error('📋 Failed to copy code:', error);
       }
     });
   });
