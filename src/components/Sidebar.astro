@@ -1,6 +1,5 @@
 ---
-import type { CollectionEntry } from 'astro:content';
-import { getPublishedPosts } from '@/utils/posts';
+import { getPostStatus, getPublishedPosts } from '@/utils/posts';
 import { groupPosts } from '@/utils/groupPosts';
 import { showAllPosts } from '@/utils/env';
 
@@ -14,20 +13,11 @@ const { currentSlug, headings } = Astro.props;
 const posts = await getPublishedPosts();
 const { groupedPosts, sortedCategories } = groupPosts(posts);
 
-function getPostStatus(post: CollectionEntry<'posts'>) {
-  if (!showAllPosts) return '';
+const getVisiblePostStatus = (post: (typeof posts)[number]) => {
+  const status = showAllPosts ? getPostStatus(post) : '';
 
-  if (post.data.draft) {
-    return ' Draft';
-  }
-
-  const publishDate = new Date(post.data.publishDate);
-  if (publishDate > new Date()) {
-    return ' Scheduled';
-  }
-
-  return '';
-}
+  return status ? ` ${status}` : '';
+};
 ---
 
 <style is:global>
@@ -69,7 +59,7 @@ function getPostStatus(post: CollectionEntry<'posts'>) {
                     >
                       {post.data.title}
                       <span class="text-gray-500 all-small-caps">
-                        {getPostStatus(post)}
+                        {getVisiblePostStatus(post)}
                       </span>
                     </a>
 

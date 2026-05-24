@@ -1,19 +1,23 @@
 ---
-import { getCollection } from 'astro:content';
+import { showAllPosts } from '@/utils/env';
+import { getPosts } from '@/utils/posts';
 import PostLayout from '../../layouts/PostLayout.astro';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('posts');
+  const posts = await getPosts({
+    includeHidden: import.meta.env.DEV || showAllPosts,
+  });
+
   return posts.map(post => ({
     params: { slug: post.slug },
-    props: { 
+    props: {
       post: {
         ...post,
         data: {
           ...post.data,
           folder: post.slug.split('/')[0],
-        }
-      }
+        },
+      },
     },
   }));
 }
