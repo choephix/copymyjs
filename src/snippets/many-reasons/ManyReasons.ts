@@ -2,42 +2,53 @@ export type ReasonIdentifier = string | symbol | ManyReasons;
 
 export class ManyReasons {
   private readonly reasons: Set<ReasonIdentifier> = new Set();
+  private readonly emptyResolvers: Set<() => void> = new Set();
 
   public onChange: ((hasReasons: boolean) => void) | null = null;
   public onEmpty: (() => void) | null = null;
   public onNonEmpty: (() => void) | null = null;
 
   public add(identifier: ReasonIdentifier, forceUnique = false): () => void {
-    if (forceUnique && typeof identifier === 'string') {
-      identifier = Symbol(identifier);
+    const reason =
+      forceUnique && typeof identifier === 'string'
+        ? Symbol(identifier)
+        : identifier;
+    const wasEmpty = !this.hasAny();
+    const previousSize = this.reasons.size;
+
+    this.reasons.add(reason);
+
+    if (this.reasons.size !== previousSize) {
+      this.onChange?.(this.hasAny());
+
+      if (wasEmpty) {
+        this.onNonEmpty?.();
+      }
     }
 
-    this.reasons.add(identifier);
-
-    this.onChange?.(this.hasAny());
-
-    if (this.reasons.size === 1) {
-      this.onNonEmpty?.();
-    }
-
-    return () => this.remove(identifier);
+    return () => this.remove(reason);
   }
 
   public remove(identifier: ReasonIdentifier): void {
-    if (this.reasons.has(identifier)) {
-      this.reasons.delete(identifier);
-      this.onChange?.(this.hasAny());
+    if (!this.reasons.delete(identifier)) {
+      return;
     }
 
-    if (this.reasons.size === 0) {
-      this.onEmpty?.();
+    this.onChange?.(this.hasAny());
+
+    if (!this.hasAny()) {
+      this.notifyEmpty();
     }
   }
 
   public removeAll() {
+    if (!this.hasAny()) {
+      return;
+    }
+
     this.reasons.clear();
-    this.onChange?.(this.hasAny());
-    this.onEmpty?.();
+    this.onChange?.(false);
+    this.notifyEmpty();
   }
 
   public set(identifier: ReasonIdentifier, value: boolean): void {
@@ -70,32 +81,46 @@ export class ManyReasons {
     };
   }
 
-  public addDuringPromise<
-    T extends { then: (onfulfilled: () => void) => void },
-  >(promiseToUnblockAfter: T, identifier: ReasonIdentifier = Symbol()) {
+  public addDuringPromise<T extends PromiseLike<unknown>>(
+    promiseToUnblockAfter: T,
+    identifier: ReasonIdentifier = Symbol()
+  ) {
     this.add(identifier);
-    promiseToUnblockAfter.then(() => this.remove(identifier));
+    Promise.resolve(promiseToUnblockAfter).then(
+      () => this.remove(identifier),
+      () => this.remove(identifier)
+    );
     return promiseToUnblockAfter;
   }
 
-  public async waitUntilEmpty(): Promise<void> {
-    if (this.hasAny()) {
-      await new Promise<void>(resolve => {
-        const cleanup = () => {
-          this.onEmpty = null;
-        };
-        this.onEmpty = () => {
-          cleanup();
-          resolve();
-        };
-      });
-    }
+  public addDuring<T extends PromiseLike<unknown>>(
+    identifier: ReasonIdentifier,
+    promiseToUnblockAfter: T
+  ) {
+    return this.addDuringPromise(promiseToUnblockAfter, identifier);
   }
-  
+
+  public async waitUntilEmpty(): Promise<void> {
+    if (!this.hasAny()) {
+      return;
+    }
+
+    await new Promise<void>(resolve => {
+      this.emptyResolvers.add(resolve);
+    });
+  }
+
   public toString() {
     const reasons = [...this.reasons]
       .map(r => (typeof r === 'symbol' ? String(r) : r))
       .join(', ');
     return `[ManyReasons (${reasons})]`;
+  }
+
+  private notifyEmpty() {
+    this.onEmpty?.();
+    const resolvers = [...this.emptyResolvers];
+    this.emptyResolvers.clear();
+    resolvers.forEach(resolve => resolve());
   }
 }

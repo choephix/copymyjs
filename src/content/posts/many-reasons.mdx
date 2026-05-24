@@ -6,11 +6,14 @@ publishDate: "2024-03-20"
 ---
 
 import CodeSnippet from '@/components/CodeSnippet.astro';
-import Example from '@/components/Example.astro';
 
 # ManyReasons
 
 A utility class for managing multiple reasons or conditions that can be added and removed dynamically. It's particularly useful for tracking multiple independent reasons why something should be in a particular state.
+
+## The Utility Class
+
+<CodeSnippet file="many-reasons/ManyReasons.ts" />
 
 ## Features
 
@@ -40,7 +43,7 @@ reasons.remove('loading');
 ```typescript
 const reasons = new ManyReasons();
 
-reasons.onChange = (hasReasons) => {
+reasons.onChange = hasReasons => {
   console.log('🎯 Reasons state changed:', hasReasons);
 };
 
@@ -58,8 +61,11 @@ reasons.onNonEmpty = () => {
 ```typescript
 const reasons = new ManyReasons();
 
-// Add a reason that will be automatically removed when the promise resolves
+// Add a reason that will be automatically removed when the promise settles
 reasons.addDuring('loading', fetchData());
+
+// Or let ManyReasons create a unique symbol reason for you
+reasons.addDuringPromise(fetchData());
 ```
 
 ## Parent-Child Relationships
@@ -76,18 +82,16 @@ parentReasons.add('parentReason');
 // childReasons now has the parent reason
 ```
 
-## Debugging
+## Debugging Helper
+
+<CodeSnippet file="many-reasons/prettifyManyReasonsMap.ts" />
 
 ```typescript
-// Helper function to debug multiple reason maps
-const debugReasons = <T extends Record<string, ManyReasons>>(map: T) => {
-  return Object.assign(map, {
-    toString() {
-      return Object.entries(map)
-        .filter(([, reasons]) => reasons instanceof ManyReasons && reasons.hasAny())
-        .map(([key, reasons]) => `"${key}": ${reasons}`)
-        .join('\n');
-    },
-  });
-};
+const reasonsByTask = prettifyManyReasonsMapToStringMethod({
+  saving: new ManyReasons(),
+  loading: new ManyReasons(),
+});
+
+reasonsByTask.saving.add('submit');
+console.log(`🧭 ${reasonsByTask}`);
 ```

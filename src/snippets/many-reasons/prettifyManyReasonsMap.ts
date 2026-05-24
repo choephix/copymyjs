@@ -1,6 +1,6 @@
 import { ManyReasons } from './ManyReasons';
 
-export function prettifyManyReasonsMapToStingMethod<
+export function prettifyManyReasonsMapToStringMethod<
   T extends Record<string, ManyReasons>,
 >(map: T) {
   return Object.assign(map, {
@@ -10,7 +10,11 @@ export function prettifyManyReasonsMapToStingMethod<
           ([, reasons]) => reasons instanceof ManyReasons && reasons.hasAny()
         )
         .map(([key, reasons]) => `"${key}": ${reasons}`)
-        .join('\n');
+        .join('
+');
     },
   });
 }
+
+export const prettifyManyReasonsMapToStingMethod =
+  prettifyManyReasonsMapToStringMethod;
