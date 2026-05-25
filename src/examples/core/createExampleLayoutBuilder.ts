@@ -1,7 +1,7 @@
 interface Logger {
-  log: (...args: any[]) => void;
-  warn: (...args: any[]) => void;
-  error: (...args: any[]) => void;
+  log: (...args: unknown[]) => void;
+  warn: (...args: unknown[]) => void;
+  error: (...args: unknown[]) => void;
 }
 
 interface ExampleLayoutBuilder {
@@ -20,7 +20,7 @@ export function createExampleLayoutBuilder(
 
   // Main container that fills available space
   const mainContainer = document.createElement('div');
-  mainContainer.className = 'p-6 space-y-4 mr-[200px]';
+  mainContainer.className = 'p-6 space-y-4';
   wrapper.appendChild(mainContainer);
 
   let logContainer: HTMLElement | null = null;
@@ -36,7 +36,7 @@ export function createExampleLayoutBuilder(
     return (...args: unknown[]) => {
       if (!logContainer) {
         logContainer = document.createElement('div');
-        logContainer.className = 
+        logContainer.className =
           'absolute top-0 bottom-0 right-0 w-[200px] ' +
           'font-mono text-xs ' +
           'transition-transform duration-300 ' +
@@ -44,19 +44,19 @@ export function createExampleLayoutBuilder(
           'animate-slide-in scrollbar-slim p-1';
 
         const innerContainer = document.createElement('div');
-        innerContainer.className = 
+        innerContainer.className =
           'w-full h-full overflow-y-auto overflow-x-hidden ' +
           'bg-[#19233a] border border-gray-700 ' +
           'rounded-lg p-2 box-border scrollbar-slim';
-        
+
         logContainer.appendChild(innerContainer);
         wrapper.appendChild(logContainer);
+        mainContainer.classList.add('mr-[200px]');
 
         Object.assign(lazyLogger, createLoggerInterface(innerContainer));
       }
 
-      const message = args.join(' ');
-      lazyLogger[type](message);
+      lazyLogger[type](...args);
     };
   }
 
@@ -67,6 +67,26 @@ export function createExampleLayoutBuilder(
       mainContainer.insertAdjacentHTML('beforeend', html);
     },
   };
+}
+
+function formatLogValue(value: unknown): string {
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  if (value instanceof Error) {
+    return `${value.name}: ${value.message}`;
+  }
+
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
+}
+
+function formatLogMessage(args: unknown[]) {
+  return args.map(formatLogValue).join(' ');
 }
 
 function createLoggerInterface(logElement: HTMLElement): Logger {
@@ -88,8 +108,11 @@ function createLoggerInterface(logElement: HTMLElement): Logger {
   };
 
   return {
-    log: (message: string) => createLogEntry(message, 'log'),
-    warn: (message: string) => createLogEntry(message, 'warn'),
-    error: (message: string) => createLogEntry(message, 'error'),
+    log: (...args: unknown[]) =>
+      createLogEntry(formatLogMessage(args), 'log'),
+    warn: (...args: unknown[]) =>
+      createLogEntry(formatLogMessage(args), 'warn'),
+    error: (...args: unknown[]) =>
+      createLogEntry(formatLogMessage(args), 'error'),
   };
 }

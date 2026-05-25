@@ -28,28 +28,56 @@ const { component, namedExport } = Astro.props;
 </div>
 
 <script>
+  type ExampleRunner = (container: HTMLElement) => void | Promise<void>;
+  type ExampleModule = Record<string, unknown>;
+
+  const exampleModules = import.meta.glob<ExampleModule>(
+    '../examples/**/*.ts'
+  );
+
+  const isExampleRunner = (value: unknown): value is ExampleRunner =>
+    typeof value === 'function';
+
+  const getErrorMessage = (error: unknown) =>
+    error instanceof Error ? error.message : String(error);
+
+  const renderExampleError = (container: HTMLElement, message: string) => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'p-4 bg-red-900/50 border border-red-500 rounded';
+
+    const text = document.createElement('p');
+    text.className = 'text-red-200';
+    text.textContent = `Failed to load example: ${message}`;
+
+    wrapper.appendChild(text);
+    container.replaceChildren(wrapper);
+  };
+
   const loadExample = async (
     container: HTMLElement,
     componentName: string,
     namedExport?: string
   ) => {
     try {
-      const module = await import(`../examples/${componentName}.ts`);
+      const modulePath = `../examples/${componentName}.ts`;
+      const importExample = exampleModules[modulePath];
 
-      if (namedExport && module[namedExport]) {
-        module[namedExport](container);
-      } else if (module.default) {
-        module.default(container);
-      } else {
-        throw new Error('No suitable export found');
+      if (!importExample) {
+        throw new Error(`Example module not found: ${componentName}`);
       }
+
+      const module = await importExample();
+      const exportName = namedExport || 'default';
+      const runner = module[exportName];
+
+      if (!isExampleRunner(runner)) {
+        throw new Error(`Example export not found: ${exportName}`);
+      }
+
+      await runner(container);
     } catch (error) {
-      console.error('Failed to load example:', error);
-      container.innerHTML = `
-      <div class="p-4 bg-red-900/50 border border-red-500 rounded">
-        <p class="text-red-200">Failed to load example: ${error.message}</p>
-      </div>
-    `;
+      console.error('💥 Failed to load example:', error);
+      renderExampleError(container, getErrorMessage(error));
     }
   };
 

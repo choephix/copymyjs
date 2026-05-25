@@ -1,9 +1,9 @@
 import { createExampleLayoutBuilder } from './core/createExampleLayoutBuilder';
 
-console.log('example1');
+console.log('🧪 example1 module loaded');
 
 export function example1(container: HTMLElement) {
-  console.log(container);
+  console.log('📦 example1 container', container);
 
   const builder = createExampleLayoutBuilder(container);
   const { logger } = builder;
@@ -17,20 +17,26 @@ export function example1(container: HTMLElement) {
     </div>
   `);
 
-  const colors = ['blue', 'red', 'green', 'purple', 'orange'];
+  const colorClasses = [
+    'bg-blue-500',
+    'bg-red-500',
+    'bg-green-500',
+    'bg-purple-500',
+    'bg-orange-500',
+  ] as const;
   let currentIndex = 0;
 
   const box = builder.container.querySelector('#box')!;
   const btn = builder.container.querySelector('#colorBtn')!;
 
   btn.addEventListener('click', () => {
-    currentIndex = (currentIndex + 1) % colors.length;
-    const newColor = colors[currentIndex];
-    box.className = `w-16 h-16 bg-${newColor}-500 transition-colors duration-500`;
-    logger.log(`Changed color to ${newColor}`);
+    currentIndex = (currentIndex + 1) % colorClasses.length;
+    const newColorClass = colorClasses[currentIndex];
+    box.className = `w-16 h-16 ${newColorClass} transition-colors duration-500`;
+    logger.log(`Changed color to ${newColorClass.replace(/^bg-|-500$/g, '')}`);
   });
 
-  console.log(logger);
+  console.log('🪵 example1 logger', logger);
 }
 
 export function example2(container: HTMLElement) {
@@ -133,8 +139,8 @@ export function example0(container: HTMLElement) {
   const randomMessages = [
     "Hey, I'm a log message!",
     "Look at me, I'm testing the logger!",
-    "The log bar should handle this just fine",
-    "Responsiveness test in progress...",
+    'The log bar should handle this just fine',
+    'Responsiveness test in progress...',
     "How's that layout looking?",
   ];
 
